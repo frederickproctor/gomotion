@@ -1,0 +1,67 @@
+#!/bin/sh
+
+OS=`uname`
+
+if [ $OS = Linux ] ; then
+
+username=`whoami`
+
+for key in `ipcs -m | grep $username | awk '{print $1}'` ; do
+  if [ "$key" = "0x00000000" ] ; then continue ; fi
+  echo -n removing shared memory $key...
+  ipcrm -M $key
+  echo done
+done
+
+for key in `ipcs -s | grep $username | awk '{print $1}'` ; do
+  if [ "$key" = "0x00000000" ] ; then continue ; fi
+  echo -n removing semaphore $key...
+  ipcrm -S $key
+  echo done
+done
+
+for key in `ipcs -q | grep $username | awk '{print $1}'` ; do
+  if [ "$key" = "0x00000000" ] ; then continue ; fi
+  echo -n removing message queue $key...
+  ipcrm -Q $key
+  echo done
+done
+
+elif [ $OS = SunOS ] ; then
+
+# go for "m   4900 0x0000077d --rw-rw-rw-  proctor sysinteg"
+
+clear=`ipcs | awk -e '$1 ~ /m/ && $3 ~ /0x/ {print $3}'`
+for id in $clear ; do
+  echo ipcrm -M $id
+  ipcrm -M $id
+done
+
+# go for "s 327680 0x0000077e --ra-ra-ra-  proctor sysinteg"
+
+clear=`ipcs | awk -e '$1 ~ /s/ && $3 ~ /0x/ {print $3}'`
+for id in $clear ; do
+  echo ipcrm -S $id
+  ipcrm -S $id
+done
+
+# go for "m4900000 0x0000077d --rw-rw-rw-  proctor sysinteg"
+
+clear=`ipcs | awk -e '$1 ~ /m/ && $2 ~ /0x/ {print $2}'`
+for id in $clear ; do
+  echo ipcrm -M $id
+  ipcrm -M $id
+done
+
+# go for "s3276800 0x0000077e --ra-ra-ra-  proctor sysinteg"
+
+clear=`ipcs | awk -e '$1 ~ /s/ && $2 ~ /0x/ {print $2}'`
+for id  in $clear ; do
+  echo ipcrm -S $id
+  ipcrm -S $id
+done
+
+fi
+
+exit 0
+

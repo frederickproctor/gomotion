@@ -1,0 +1,78 @@
+#!/bin/sh
+
+# Shows scaling with pos, vel, acc and jerk, no subinterpolation
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outv
+tpar 1 1 2
+linear
+vel
+movew 0 0 0 0 0 0
+movew 10 0 0 0 0 0
+run 300
+scale 0.9 1 1
+run 10
+scale 0.8 1 1
+run 10
+scale 0.7 1 1
+run 10
+scale 0.6 1 1
+run 10
+scale 0.5 1 1
+run 10
+scale 0.4 1 1
+run 10
+scale 0.3 1 1
+run 10
+scale 0.2 1 1
+run 10
+scale 0.1 1 1
+run 10
+scale 0.0 1 1
+run 10
+scale 1.0 1 1
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outa
+tpar 1 1 2
+linear
+acc
+movew 0 0 0 0 0 0
+movew 10 0 0 0 0 0
+run 300
+scale 0.9 1 1
+run 10
+scale 0.8 1 1
+run 10
+scale 0.7 1 1
+run 10
+scale 0.6 1 1
+run 10
+scale 0.5 1 1
+run 10
+scale 0.4 1 1
+run 10
+scale 0.3 1 1
+run 10
+scale 0.2 1 1
+run 10
+scale 0.1 1 1
+run 10
+scale 0.0 1 1
+run 10
+scale 1.0 1 1
+run
+EOF
+
+echo "set title '$title' ; plot 'outv' using 1:2 title 'Velocity', 'outa' using 1:2 title 'Acceleration'" | gnuplot -persist
+
+cat <<EOF
+This shows the effect of speed scaling in the middle of moves.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

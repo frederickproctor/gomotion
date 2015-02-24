@@ -1,0 +1,219 @@
+#!/usr/bin/python
+
+# Run as, for example,
+# bin/spinup -s gothos -m CNC1_RESOURCE -p 7878 -c gothos:81
+
+import sys, os, signal, time, errno, getopt, re, socket, httplib, xml.etree.ElementTree as ET, StringIO, shlex, subprocess, ConfigParser
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "c:s:m:p:t:wd?", ["cell=", "device=", "machine=", "port=", "time=", "wait", "debug", "help"])
+except getopt.GetoptError, err:
+    print str(err)
+    sys.exit(1)
+
+CELL = "localhost"
+DEVICE = "localhost"
+MACHINE = "M1"
+PORT = 7878
+PERIOD = 1
+WAIT = False
+DEBUG = False
+DESCRIPTION = None
+
+def print_help():
+    global CELL, DEVICE, MACHINE, PORT, PERIOD
+    print "-c, --cell <addr>    : connect to MTConnect Cell Agent on address <addr>, default", CELL 
+    print "-s, --device <addr>  : connect to MTConnect Device Agent on address <addr>, default", DEVICE
+    print "-m, --machine <name> : use <name> for machine, default", MACHINE
+    print "-p, --port <port>    : serve adapter SHDR port <port>, default", PORT
+    print "-t, --time <period>  : query MTConnect Cell Agent every <period> seconds, default", PERIOD
+    print "-w, --wait           : wait on Go Motion, otherwise wait on operator input"
+    print "-d, --debug          : turn debug printing on, default off"
+    print "-?, --help           : print this help message"
+
+for o, a in opts:
+    if o in ("-c", "--cell"):
+        CELL = a
+    elif o in ("-s", "--device"):
+        DEVICE = a
+    elif o in ("-m", "--machine"):
+        MACHINE = a
+    elif o in ("-p", "--port"):
+        try: PORT = int(a)
+        except:
+            print_help()
+            sys.exit(1)
+    elif o in ("-t", "--time"):
+        try: PERIOD = float(a)
+        except:
+            print_help()
+            sys.exit(1)
+    elif o in ("-w", "--wait"):
+        WAIT = True
+    elif o in ("-d", "--debug"):
+        DEBUG = True
+    elif o in ("-?", "--help"):
+        print_help()
+        sys.exit(0)
+
+conn = httplib.HTTPConnection(DEVICE)
+
+getstr = "/" + MACHINE + "/probe"
+if DEBUG: print "GET", getstr
+
+delay = 1000000
+delta = 1
+while delay > 0:
+    try:
+        conn.request("GET", getstr)
+        delay = 0
+    except:
+        print "spinup: can\'t get response from", DEVICE, "for", getstr
+        delay = delay - delta
+        if delay < 0:
+            sys.exit(1)
+        else:
+            time.sleep(delta)
+
+resp = conn.getresponse()
+if resp.status != 200:
+    print "spinup: bad response from", DEVICE, "for", getstr
+    sys.exit(1)
+
+data = resp.read()
+if DEBUG: print data
+
+conn.close()
+
+tree = ET.parse(StringIO.StringIO(data))
+root = tree.getroot()
+
+# the element names will all be prefixed with something like
+# '{urn:mtconnect.org:MTConnectStreams:1.2}', so we need to get
+# this from the root tag
+
+m = re.match("^{(.*)}", str(root.tag))
+if m == None: prefix = ""
+else: prefix = "{" + m.group(1) + "}"
+
+# shoud get something like this:
+# <MTConnectDevices ...>
+#   <Header ...>
+#   <Devices>
+#     <Device id="M1" name="M1" uuid="xxx">
+
+NAME = None
+for devices in root.findall(".//" + prefix + "Devices"):
+    for device in devices:
+        m = re.match(prefix + "(.*)", str(device.tag))
+        if m == None: tag = device.tag
+        else: tag = m.group(1)
+        if tag == "Device":
+            NAME = device.attrib.get("name", None)
+
+if (None == NAME):
+    print "can\'t find description for", MACHINE
+    sys.exit(1)
+
+if DEBUG: print "found", MACHINE, "as", "\'" + NAME + "\'"
+
+machineDB = {
+    "M1": 0,
+    "CNC1_RESOURCE" : 1,
+    "CNC2_RESOURCE" : 2,
+    "CNC4_RESOURCE" : 3,
+    "CNC3Old_RESOURCE" : 4,
+    "CNC3New_RESOURCE" : 5,
+    }
+
+machineID = machineDB.get(NAME, None)
+if machineID == None:
+# generate .ini file based on <number> suffix of machine name
+    m = re.match(".*([0123456789]+)$", NAME)
+    if m == None: machineID = 0
+    else: machineID = m.group(1)
+
+mydir = os.path.dirname(sys.argv[0]) + "/"
+
+gofile =  mydir + "../etc/" + "gomotion" + ".ini"
+inifile = mydir + "../etc/" +  NAME +      ".ini"
+
+retval = os.system(mydir + "./godup.pl " + str(machineID) + " < " + gofile + " > " + inifile)
+if 0 != retval: sys.exit(1)
+
+gorun = mydir + "gorun" + " -i " + inifile + " -w "
+if DEBUG: gorun = gorun + " -d "
+
+go_adapter = mydir + "go_adapter -d -t 3" +  " -i " + inifile + " -p " + str(PORT)
+if DEBUG: go_adapter = go_adapter + " -d "
+
+TASK_TCP_PORT = 8120
+config = ConfigParser.ConfigParser()
+if len(config.read(inifile)) == 1:
+    try: TASK_TCP_PORT = config.get("TASK", "TCP_PORT")
+    except: pass
+else: print "can\'t read ini file", inifile
+
+if DEBUG: print "using task port", TASK_TCP_PORT
+
+mtconnect_client = mydir + "mtconnect_client" + " -c " + CELL + " -m " + MACHINE + " -p " + str(TASK_TCP_PORT)
+if DEBUG: mtconnect_client = mtconnect_client + " -d "
+
+gorun_p = None
+go_adapter_p = None
+mtconnect_client_p = None
+
+def cleanup():
+    global DEBUG, mtconnect_client_p, go_adapter_p, gorun_p
+    try:
+        if None != mtconnect_client_p: mtconnect_client_p.send_signal(signal.SIGINT)
+        if None != go_adapter_p: go_adapter_p.send_signal(signal.SIGINT)
+        if None != gorun_p: gorun_p.send_signal(signal.SIGINT)
+    except OSError, msg:
+        if DEBUG: print str(msg)
+
+    if DEBUG: print "spinup quitting"
+    sys.exit(0)
+
+def do_script(s):
+    retval = os.system(mydir + "../scripts/" + s + " -i " + inifile)
+
+def quit(signum, frame):
+    cleanup()
+
+try:
+    gorun_p = subprocess.Popen(shlex.split(gorun))
+except OSError, msg:
+    gorun_p = None
+    if DEBUG: print gorun, ":", str(msg)
+    cleanup()
+
+time.sleep(3)
+
+do_script("homeall.tcl")
+
+try:
+    go_adapter_p = subprocess.Popen(shlex.split(go_adapter))
+except OSError, msg:
+    go_adapter_p = None
+    if DEBUG: print go_adapter, ":", str(msg)
+    cleanup()
+
+try:
+    mtconnect_client_p = subprocess.Popen(shlex.split(mtconnect_client))
+except OSError, msg:
+    mtconnect_client_p = None
+    if DEBUG: print mtconnect_client, ":", str(msg)
+    cleanup()
+
+signal.signal(signal.SIGINT, quit)
+
+if WAIT:
+    try: gorun_p.wait()
+    except OSError: pass
+else:
+    try: s = raw_input()
+    except EOFError: pass
+
+cleanup()
+

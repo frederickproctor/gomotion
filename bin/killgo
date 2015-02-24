@@ -1,0 +1,5 @@
+#!/bin/bash
+
+killall -KILL mtconnect_client go_adapter tasksvr taskmain toolmain gotk gotcl gomain gostepper gorunall gorun
+
+exit 0

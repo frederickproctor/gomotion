@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# Tests time-based joint moves
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > out
+par 1 1 2 7
+par 2 1 2 7
+par 3 1 2 7
+par 4 1 2 7
+par 5 1 2 7
+par 6 1 2 7
+linear
+pos
+movej 0 0 0 0 0 0
+movej 1 2 3 4 5 6
+time 10
+movej 0 0 0 0 0 0
+notime
+run
+EOF
+
+echo "set title '$title' ; plot 'out' using 1:2 with linespoints title 'Joint 1', '' using 1:3 with linespoints title 'Joint 2', '' using 1:4 with linespoints title 'Joint 3', '' using 1:5 with linespoints title 'Joint 4', '' using 1:6 with linespoints title 'Joint 5', '' using 1:7 with linespoints title 'Joint 6'" | gnuplot -persist
+
+cat <<EOF
+This shows position v. time of coordinated joint jogging.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

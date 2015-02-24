@@ -1,0 +1,61 @@
+Quick Start Guide to building and demoing Go Motion for Windows
+---------------------------------------------------------------
+The INSTALL file has general instructions for compiling software built
+using Autotools for Linux. Ignore that for Windows.
+
+1. Obtain and unzip the Go Motion distribution, which you have
+probably already done if you're reading this README.
+
+2. There is no Install Shield script -- this is the full source code
+distribution so you'll need to compile it yourself using Microsoft
+Visual C++ Express 2010. This is free. Install this if you haven't.
+
+3. You'll need to install Ulapi if you have not. Get the "ulapi.zip"
+file from the same place you got gomotion and follow the Windows
+install instructions.
+
+4. Go into the gomotion\win32api folder and double-click the "gomotion.sln"
+file to launch Microsoft Visual C++ Express 2010. Build the solution.
+
+5. Run the simulation batch file "gorun.bat". You may see a bunch of
+diagnostics print out, then a window will pop up titled "Go Motion"
+that shows the position values and has some buttons for moving the
+robot around. This is the graphical pendant, a substitute for a real
+robot pendant you would use on a real industrial robot.
+
+3. At the pendant, click the radio button next to the joint position
+labeled "1" near the upper left, then click the "Home" button near the
+middle. This will move the joint to its home position, and the digits
+will turn from red to black. Do the same for joints 2-6. If this
+doesn't happen, jog the joint first using the "Jog+" button and then
+try homing again.
+
+4. Click the radio button labeled "World" in the row below the
+position digits. The position will display XYZ RPW Cartesian
+coordinates. 
+
+5. Select the "Z" axis radio button, then jog it up and down with the
+"Jog-" and "Jog+" buttons. You should see the Z position numbers
+change accordingly. The position can't be jogged past the software
+limits, so if it looks like it's not responding, jog the other way and
+get off the limit. 
+
+6. Click the "Move..." button to pop up a window into which you can
+type target XYZ RPW coordinates (in mm and degrees), and a time for
+the motion to complete. Fill in some numbers close to what's there,
+put in a time of 1, and click "Write". The position should show motion
+to the desired target in about the desired time. Click "Done" to
+dismiss the Move window. 
+
+7. The motion likely took longer, since the speeds are clamped to
+limits set in the etc/gomotion.ini file. It also took longer since
+this demo is not running in real time. 
+
+8. You'll now want to customize Go Motion for your device. Create
+your own .ini file based on gomotion.ini, and change the parameters
+according to the configuration of your own device. Comments in the
+.ini file can help. 
+
+See the HTML documentation in doxygen-doc/html/index.html for many
+more details on the software. 
+

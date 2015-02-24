@@ -1,0 +1,25 @@
+#!/bin/sh
+
+cvs -d /mxproj/foundation/cvsroot co -P gomotion || exit 1
+
+cd gomotion
+
+./autoconf.sh || exit 1
+
+make dist
+
+for file in `ls -rt gomotion-*.tar.gz` ; do dist=$file ; done
+
+if [ x"$dist" = x ] ; then exit 1 ; fi
+
+tar xzvf $dist || exit 1
+
+cd `echo $dist | sed s^.tar.gz^^` || exit 1
+
+./autoconf.sh || exit 1
+
+./build || exit 1
+
+echo Success\!
+
+exit 0

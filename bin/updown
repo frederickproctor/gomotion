@@ -1,0 +1,16 @@
+#!/bin/sh
+# the next line restarts using gotk \
+exec /usr/local/bin/gotk "$0" "$@"
+
+# set a convenient alias
+interp alias {} move {} gotk_traj_move_world
+
+# we need to set timeout to forever, so we'll queue every move
+gotk_set_timeout forever
+
+# now just run up and down forever
+while {true} {
+    move 0 0 -20 0 0 0
+    move 0 0 -19 0 0 0
+}
+

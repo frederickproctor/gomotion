@@ -1,0 +1,46 @@
+Building an MTConnect Interface to Go Motion
+--------------------------------------------
+
+1. Check out the MTConnect source code from the Git repository: 
+
+   cd /usr/local
+   mkdir mtconnect
+   cd mtconnect
+   git clone git://github.com/mtconnect/adapter.git
+   git clone git://github.com/mtconnect/cppagent.git
+
+2. Extend the MTConnect code with a makefile to build an adapter library:
+
+   cd /usr/local/mtconnect/adapter/src
+   cat > Makefile
+libmtconnect.a : device_datum.o string_buffer.o client.o server.o adapter.o service.o logger.o condition.o
+	ar r $@ $+
+	ranlib $@
+
+%.o : %.cpp
+	g++ -c -g $< -o $@
+
+install : 
+	- \mkdir ../../include
+	- \cp -f *.hpp ../../include
+	- \mkdir ../../lib
+	- \cp -f libmtconnect.a ../../lib
+^D
+   make
+   make install
+
+3. Build the stock MTConnect C++ agent:
+
+   cd /usr/local/mtconnect/cppagent/agent
+   cmake .
+   make
+
+This will build "agent", the generic MTConnect agent. 
+
+4. Edit and compile Go Motion's MTConnect adapter:
+
+   cd /usr/local/proj/gomotion
+   make
+
+This will build Go Motion, and the adapter "go_adapter". 
+

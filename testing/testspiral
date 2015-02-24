@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Spiral moves out and in
+# format is 13 numbers:
+# movec end-x y z r p w center-x y z normal-x y z turns
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outxy
+tpar 1 2 7
+linear
+pos
+movew 0 0 0 0 0 0
+movec 0 3 0 0 0 0   0 1 0    0 0  1   10
+movec 0 1 0 0 0 0   0 2 0    0 0  1   0
+movec 0 0 0 0 0 0   0 -1 0   0 0 -1   1
+run
+EOF
+
+echo "set title '$title' ; set size ratio -1 ; plot 'outxy' using 2:3" | gnuplot -persist
+
+cat << EOF | ./gotestsh -t 1 -n 1 > outxy
+tpar 1 2 7
+linear
+pos
+movew 0 0 0 0 0 0
+movec 0 20 0 0 0 0 0 5 0 0 0 1 10
+run
+EOF
+
+echo "set title '$title' ; set size ratio -1 ; plot 'outxy' using 2:3 with linespoints" | gnuplot -persist
+
+cat <<EOF
+This shows spiral motion around some spiral paths, and the effects of
+large differences in start- and end radii.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

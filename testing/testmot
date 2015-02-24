@@ -1,0 +1,52 @@
+#!/bin/sh
+
+# Shows pos, vel, acc and jerk, no subinterpolation
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outp
+tpar 1 1 2
+linear
+pos
+movew 0 0 0 0 0 0
+movew 2 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outv
+tpar 1 1 2
+linear
+vel
+movew 0 0 0 0 0 0
+movew 2 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outa
+tpar 1 1 2
+linear
+acc
+movew 0 0 0 0 0 0
+movew 2 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outj
+tpar 1 1 2
+linear
+jerk
+movew 0 0 0 0 0 0
+movew 2 0 0 0 0 0
+run
+EOF
+
+echo "set title '$title' ; plot 'outp' using 1:2 title 'Position', 'outv' using 1:2 title 'Velocity', 'outa' using 1:2 title 'Acceleration', 'outj' using 1:2 title 'Jerk' " | gnuplot -persist
+
+cat <<EOF
+This shows time plots of position, velocity, accelration and jerk.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

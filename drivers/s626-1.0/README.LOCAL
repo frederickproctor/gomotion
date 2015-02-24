@@ -1,0 +1,23 @@
+Got these compile errors:
+
+make[1]: Entering directory `/usr/local/rtai-3.3/linux-source-2.6.15'
+  CC [M]  /usr/local/proj/gomotion/drivers/s626-1.0/s626drv.o
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c: In function 'S626_init_one':
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c:588: error: 'struct pci_dev' has no member named 'slot_name'
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c:620: error: 'struct pci_dev' has no member named 'slot_name'
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c:588: warning: unused variable 'print_name'
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c: In function 'S626_remove_one':
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c:667: error: 'struct pci_dev' has no member named 'slot_name'
+/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.c:667: error: 'struct pci_dev' has no member named 'slot_name'
+make[2]: *** [/usr/local/proj/gomotion/drivers/s626-1.0/s626drv.o] Error 1
+make[1]: *** [_module_/usr/local/proj/gomotion/drivers/s626-1.0] Error 2
+make[1]: Leaving directory `/usr/local/rtai-3.3/linux-source-2.6.15'
+make: *** [all] Error 2
+
+Found solution on web:
+
+The pci_dev structure lost the slot_name member a while ago, I think it was dropped after 2.4 AFAIK. You should use the newer pci_name()...
+You could try replacing all references to pci_dev->slot_name with pci_name(pci_dev) in the source, that should fix it.
+
+Fixed it, as annotated with NIST comments.
+

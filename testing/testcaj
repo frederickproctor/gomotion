@@ -1,0 +1,44 @@
+#!/bin/sh
+
+# Compares constant vel, acc and jerk planning, plotting vel v. time,
+# no subinterpolation
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outcv
+tpar 1 1000000000 1000000000
+linear
+vel
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outca
+tpar 1 2 1000000000
+linear
+vel
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outcj
+tpar 1 2 5
+linear
+vel
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+echo "set title '$title' ; plot 'outcv' using 1:2 title 'Constant Velocity', 'outca' using 1:2 title 'Constant Acceleration', 'outcj' using 1:2 title 'Constant Jerk'" | gnuplot -persist
+
+cat <<EOF
+This compares constant velocity, acceleration and jerk.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

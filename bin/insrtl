@@ -1,0 +1,24 @@
+#!/bin/sh
+
+# read in RTAI_DIR
+. `dirname $0`/../rtaidir
+
+UTS_RELEASE=`uname -r | cut -f 1,2 -d .`
+
+if [ ! -d $RTAI_DIR/modules ] ; then exit 1 ; fi
+
+cd $RTAI_DIR/modules
+
+if [ "$UTS_RELEASE" = "2.4" ] ; then
+    for module in rtai_hal rtai_ksched rtai_math rtai_fifos rtai_shm rtai_sem ; do
+	sudo insmod $module.o
+    done
+    exit 0
+elif [ "$UTS_RELEASE" = "2.6" ] ; then
+    for module in rtai_hal rtai_up rtai_math rtai_fifos rtai_shm rtai_sem ; do
+	sudo insmod $module.ko
+    done
+    exit 0
+fi
+
+exit 1

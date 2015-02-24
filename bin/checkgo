@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for prog in gorun gorunall gostepper gomain gotcl gotk toolmain taskmain tasksvr go_adapter mtconnect_client ; do
+    num=`ps ax | grep $prog | wc -l`
+    num=`expr $num - 1`
+    if [ $num -gt 0 ] ; then echo $prog \($num\) ; fi
+done
+

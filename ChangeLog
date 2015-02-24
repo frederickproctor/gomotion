@@ -1,0 +1,156 @@
+1.27	23 February 2015
+	Added go_uxz for X-Z vector rotation representation.
+
+1.26	12 May 2014
+	Reworked the interface to not use UL_USE_UNIX,RTAI, and moved from
+	the void* interface to the named* interface. Added
+	ulapi/rtapi_rtm_xxx functions.
+
+1.25	5 December 2012
+	Added the RS-274-NGC interpreter to the task controller, and
+	extended it to handle the tool controller as a subordinate.
+
+1.24	12 June 2012
+	Added tool controller 'toolmain'.
+	Added task controller. Added go_strncpy.
+	Set the traj and servo loop starting serial numbers to differ so
+	that the stuffed commands actually get triggered.
+	Added support for MTConnect: go_adapter.{cpp,hpp}
+	Added reset button and estop check for pendant.
+	Added go_linear_cos_sin_solve().
+	Fixed myexit() bug in gotk.c where nulled pointers were referenced
+	shortly afterward during shutdown.
+
+1.23	20 May 2011
+	Added emu_smartmotor.c to emulate the serial interface to
+	Animatics Smart Motors; tweaked ext_smartmotor.c based on real
+	testing; fixed some printf and scanf problems associated with
+	changing to GO_REAL_FLOAT,LONG_DOUBLE as a test; added three21kins
+	for 3-2-1 kinematics machines like Puma or Fanuc, and updated
+	Fanuc kins to use these instead of general serial kinematics;
+	added test for Gnu Scientific Library (GSL) and if found, compile
+	in the sixdof.c best fit test; updated to Visual C++ Express 2010.
+
+1.22	20 May 2010
+	Normalized genserkins inverse kinematics so that joint angles are
+	between -pi and pi; externed some extra functions from genserkins;
+	Changed go_screw to go_vel type; added go_body type for rigid
+	body mass and inertia parameters, and updated genserkins to
+	use this for inverse Jacobian; factored out ulapi into standalone
+	distribution; added Doxygen module for go math; added
+	go_hom_hom_mult; changed condition on go_quat_quat_compare to call
+	all zero rotations equivalent; added gomainlib to Win32 solution;
+	took out CVS-modified comments to avoid unnecessary CVS mods;
+	took out 'function' prefix for shell functions in gorun; added
+	script running button to pendant.tcl
+
+1.21	11 August 2009
+	Fixed a bug in genserkins.c inverse kinematics, where it didn't
+	converge due to the incremental displacement pose not being in
+	the base coordinate frame
+
+1.20	7 August 2009
+	Added ulapi_system; fixed bug in genserkins.c forward jacobian
+
+1.19	5 June 2009
+	Added go_point_plane_project, go_point_line_project,
+	go_line_plane_project, go_cart_cart_par,perp
+	Added 3x3, 4x4 explicit optimized matrix functions
+	Added a zeroth-order feedforward to PID
+	Added condition variables via ulapi_cond_xxx
+	Added go_cart_cart_rot; added ulapi_task_join()
+
+1.18	24 September 2008
+
+	Added time-based joint moves; linking of user-supplied external
+	interface code via --with-extintf
+
+1.17	11 April 2008
+
+	Fixed checking for active controllers by configuration and other
+	programs, using heartbeats or NOP config requests.
+	Added 'here' feature for setting the current Cartesian position.
+	Handled varying numbers of active axes better.
+	Added servo status 'enable' to flag when outputs can go out.
+	Used nominal instead of actual joint values as reference for
+	calculating the servo setpoint increment for teleoperation.
+	Added [SERVO] HOWMANY to establish how many joints we have, and
+	reworked the servo tasks, trajectory task, gomain, gosh, gotk and
+	gorun to only run, configure and use the joints needed.
+	Stopped overriding defaults in rtapi_arg_get_int,string.
+	Added ext_galil.c and emu_galil.c to test external servos.
+	Added tool transforms.
+	Fixed go_mat_norm so that it normalizes any reasonable
+	rotation matrix.
+	Changed from igps.c, tracker.c to full igpserver,client.c.
+	Fixed circular (spiral helical) motion so that it uses
+	estimated (average radial) arc length as the interpolation
+	parameter.
+
+1.16:	7 December 2007
+
+	Added socket functions to ulapi, and build igps.c with a socket
+	interface to the indoor GPS.
+	Ramped the joystick speed to limit acceleration.
+	Added circular motion.
+
+1.15:	3 October 2007
+
+	Fixed bug in walk_in function for external Cartesian position
+	referencing via 'Xinv'.
+	Added joystick support to the Tk GUI.
+	Took out go_kin_home function, which wasn't used.
+	Added simulated index pulse homing to stepper motor external
+	interface.
+	Added tool moves and teleop.
+	Added go_screw data type for velocity, and changed all the
+	kinematics code accordingly.
+
+1.14:	18 September 2007
+
+	Added tracker application and traj_ref_struct for tracking of
+	external Cartesian position measurements. 
+
+	Changed default timeout in gotk to forever. Scripts now work more
+	intuitively without calling gotk_set_timeout forever explicitly.
+	Added Stop button to pendant GUI.
+
+1.10-13:
+	31 May 2007
+
+	Added gotk_traj_hold to hold position upon startup.
+	Reworked kinematics and units, adding general serial kinematics. 
+	Added matrix and vector types to gomath to support Jacobians.
+
+1.9:	18 December 2006
+
+	Stable system tested on winch-driven cable robot.
+
+1.8:	An intermediate build.
+
+1.7:
+	18 August 2006
+
+	Added walked-in speed scaling.
+	Added time-based world and joint moves.
+	Took out CJ, CA motion profile types and just used CJ.
+
+1.6:	16 June 2006
+
+	Added go_motion_queue_set_scale for speed scaling, aka
+	feed override, but it just sets a scale factor immediately
+	and the testing/testscale script shows that the jerk jumps
+	unboundedly so we need to "walk in" the scaling.
+
+1.5:	12 June 2006
+
+	Added support for Linux 2.6, including:
+	No anonymous unions, using .u and .v instead;
+	Changes to rtlib/Makefile,SETUP for 2.4 kernel module compile
+
+1.4:	9 June 2006
+
+	Added gohal.c, which sets up base timer period.
+
+1.1-1.3:
+	Baseline system under development.

@@ -1,0 +1,6 @@
+#!/bin/sh
+
+make -f Makefile.local `cat ulapidir` modules
+make -f Makefile.local `cat ulapidir`
+
+exit $?

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+UTS_RELEASE=`uname -r | cut -f 1,2 -d .`
+
+if [ "$UTS_RELEASE" = "2.4" ] ; then
+    for module in rtai_sem rtai_shm rtai_fifos rtai_math rtai_ksched rtai_hal ; do
+	sudo rmmod $module
+    done
+    exit 0
+elif [ "$UTS_RELEASE" = "2.6" ] ; then
+    for module in rtai_sem rtai_shm rtai_fifos rtai_math rtai_up rtai_hal ; do
+	sudo rmmod $module
+    done
+    exit 0
+fi
+
+exit 1

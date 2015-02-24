@@ -1,0 +1,36 @@
+This is the Windows implementation of Go Motion.
+
+To build, open 'win32api.sln' in Microsoft Visual C++. The project was
+set up with VC++ Express 2010 and may be converted by more recent VC++
+versions. 
+
+Do a "Build" in VC++. The executables end up in the Debug folder. 
+
+Open a command prompt and try this first: 
+
+   cd Debug
+   gokintest -i ..\..\etc\genhex.ini
+
+This will bring up the Go Motion kinematics tester with the .ini file
+of a Stewart Platform hexapod machine. You will see the cable lengths
+and position displayed.
+
+Type:
+
+   i
+
+to go into inverse kinematics mode, then
+
+   0 0 -110 0 0 0
+
+to show the cable lengths at 110 units down. 
+
+To run a full controller, run the 'gorun.bat' file.
+To run the graphical pendant, you need to get ActiveTcl and install it. 
+Put C:\Tcl\bin in your path.
+
+To run scripts, do this: 
+
+cd Debug
+gotk.exe ..\..\scripts\raster.tcl -- -i ..\..\etc\genhex.ini
+

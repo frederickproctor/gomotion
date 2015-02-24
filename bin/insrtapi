@@ -1,0 +1,47 @@
+#!/bin/bash
+
+USAGE="usage: -i <inifile> [-d ] [-?]"
+
+inifile=
+debugval=0
+
+while getopts 'i:d?' c
+do
+    case $c in
+	i)
+	    inifile=$OPTARG
+	    ;;
+	d)
+	    debugval=1
+	    ;;
+	\?)
+	    echo $USAGE
+	    exit 1
+	    ;;
+    esac
+done
+
+if [ x"$inifile" = x ] ; then
+    echo $USAGE
+    exit 1
+fi
+
+if [ ! -f "$inifile" ] ; then
+    echo can\'t find $inifile
+    exit 1
+fi
+
+thisdir=`dirname $0`
+
+if [ -f $thisdir/../ulapi_dir ] ; then
+    . $thisdir/../ulapi_dir
+else
+    ULAPI_DIR=/usr/local/ulapi
+fi
+
+RTAPI_HAL_NSECS_PER_PERIOD=`$ULAPI_DIR/bin/inifind NSECS_PER_PERIOD RTAPI_HAL $inifile`
+if [ x"$RTAPI_HAL_NSECS_PER_PERIOD" = x ] ; then RTAPI_HAL_NSECS_PER_PERIOD=0 ; fi
+
+sudo insmod -f $ULAPI_DIR/lib/rtapi_hal_mod.ko RTAPI_HAL_NSECS_PER_PERIOD=$RTAPI_HAL_NSECS_PER_PERIOD DEBUG=$debugval
+
+exit 0

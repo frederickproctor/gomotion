@@ -1,0 +1,53 @@
+#!/bin/sh
+
+# Compares constant, linear, cubic and quintic interpolation, for
+# constant-jerk planning
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.1 -n 10 > outk
+tpar 1 2 5
+constant
+pos
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.1 -n 10 > outl
+tpar 1 2 5
+linear
+pos
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.1 -n 10 > outc
+tpar 1 2 5
+cubic
+pos
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.1 -n 10 > outq
+tpar 1 2 5
+quintic
+pos
+movew 0 0 0 0 0 0
+movew 1 0 0 0 0 0
+run
+EOF
+
+echo "set title '$title' ; plot 'outk' using 1:2 title 'Constant', 'outl' using 1:2 title 'Linear', 'outc' using 1:2 title 'Cubic', 'outq' using 1:2 title 'Qunitic'" | gnuplot -persist
+
+cat <<EOF
+This shows the effects of various interpolations
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

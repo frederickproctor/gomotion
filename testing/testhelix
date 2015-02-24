@@ -1,0 +1,50 @@
+#!/bin/sh
+
+# Helical moves
+# format is 13 numbers:
+# movec end-x y z r p w center-x y z normal-x y z turns
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outxyz
+tpar 1 2 7
+linear
+pos
+movew 0  1 0 0 0 0
+movec 0 -1 10 0 0 0   0 0 0   0 0 -1   10
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outzxy
+tpar 1 2 7
+linear
+pos
+movew 0  0  1 0 0 0
+movec 10 0 -1 0 0 0   0 0 0   1 0 0   10
+movew 0  0  1 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > outoff
+tpar 1 2 7
+linear
+pos
+movew 1  1 -1  0 0 0
+movec 10 10 8 0 0 0   0 0 0   1 1 1   10
+run
+EOF
+
+echo "set title '$title' ; set xlabel 'X'; set ylabel 'Y' ; set zlabel 'Z' ; set size square ; splot 'outxyz' using 2:3:4 title 'XYZ'" | gnuplot -persist
+
+echo "set title '$title' ; set xlabel 'X'; set ylabel 'Y' ; set zlabel 'Z' ; set size square ; splot 'outzxy' using 2:3:4 title 'XYZ'" | gnuplot -persist
+
+echo "set title '$title' ; set xlabel 'X'; set ylabel 'Y' ; set zlabel 'Z' ; set size square ; splot 'outoff' using 2:3:4 title 'XYZ'" | gnuplot -persist
+
+cat <<EOF
+This shows some 3D plots of helical motion along various axes.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

@@ -1,0 +1,194 @@
+#!/usr/bin/python
+
+import sys, os, signal, time, errno, getopt, re, socket, httplib, xml.etree.ElementTree as ET, StringIO
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], "c:m:h:p:t:d?", ["cell=", "machine=", "host=", "port=", "time=", "debug", "help"])
+except getopt.GetoptError, err:
+    print "mtconnect_client", str(err)
+    sys.exit(1)
+
+CELL = "localhost"
+MACHINE = ""
+HOST = "localhost"
+PORT = 8120
+PERIOD = 1
+DEBUG = False
+
+def print_help():
+    print "-c, --cell <addr>    : connect to MTConnect Cell Agent on address <addr>, default", CELL
+    print "-m, --machine <name> : use <name> for machine, default", MACHINE
+    print "-h, --host <addr>    : connect to Go Motion on address <addr>, default", HOST
+    print "-p, --port <port>    : connect to Go Motion on port <addr>, default", PORT
+    print "-t, --time <period>  : query MTConnect Cell Agent every <period> seconds, default", PERIOD
+    print "-d, --debug          : turn debug printing on, default off"
+    print "-?, --help           : print this help message"
+
+for o, a in opts:
+    if o in ("-c", "--cell"):
+        CELL = a
+    elif o in ("-m", "--machine"):
+        MACHINE = a
+    elif o in ("-h", "--host"):
+        HOST = a
+    elif o in ("-p", "--port"):
+        try: PORT = int(a)
+        except: 
+            print_help()
+            sys.exit(1)
+    elif o in ("-t", "--time"):
+        try: PERIOD = float(a)
+        except:
+            print_help()
+            sys.exit(1)
+    elif o in ("-d", "--debug"):
+        DEBUG = True
+    elif o in ("-?", "--help"):
+        print_help()
+        sys.exit(0)
+
+# connect to Go Motion task server
+try: 
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+except socket.error, msg:
+    print "mtconnect_client: can\'t get a socket"
+    sys.exit(1)
+
+doit = True
+def quit(signum, frame):
+    global doit
+    doit = False
+
+signal.signal(signal.SIGINT, quit)
+
+doit = True
+while doit:
+    try:
+        client.connect((HOST, PORT))
+        break
+    except socket.error, msg:
+        print "mtconnect_client: trying to connect to Go Motion task on", HOST, "port", str(PORT)+":", msg
+        time.sleep(PERIOD)
+if doit == False: 
+    print "mtconnect_client: aborting"
+    sys.exit(signal.SIGINT)
+
+retval = 0
+
+theCommand = ""
+theNumber = 0
+oldNumber = theNumber
+theProgram = ""
+
+def setCommand(a):
+    global theCommand
+    theCommand = a
+
+def getCommand():
+    global theCommand
+    return theCommand
+
+def setNumber(a):
+    global theNumber, oldNumber
+    try: i = int(a)
+    except: return   # ignore non-numbers like UNAVAILABLE
+    oldNumber = theNumber
+    theNumber = i
+
+def getNumber():
+    global theNumber
+    return theNumber
+
+def newNumber():
+    global theNumber, oldNumber
+    if theNumber <> oldNumber: return True
+    return False
+
+def setProgram(a):
+    global theProgram
+    theProgram = a
+
+def getProgram():
+    global theProgram
+    return theProgram
+
+getstr = "/" + MACHINE + "/current"
+
+conn = httplib.HTTPConnection(CELL)
+
+doit = True
+while doit:
+    time.sleep(PERIOD)
+    if DEBUG: print "GET", getstr
+
+    try: conn.request("GET", getstr)
+    except:
+        print "mtconnect_client: can\'t request GET from", CELL, "for", getstr
+        conn.close()
+        conn = httplib.HTTPConnection(CELL)
+        continue
+
+    try: resp = conn.getresponse()
+    except:
+        print "mtconnect_client: can\'t get response from", CELL, "for", getstr
+        conn.close()
+        conn = httplib.HTTPConnection(CELL)
+        continue
+
+    if resp.status != 200:
+        print "mtconnect_client: bad status:", str(resp.status)
+        continue
+
+    data = resp.read()
+    if DEBUG: print "mtconnect_client: got data", data
+
+    tree = ET.parse(StringIO.StringIO(data))
+    root = tree.getroot()
+
+    # the element names will all be prefixed with something like
+    # '{urn:mtconnect.org:MTConnectStreams:1.2}', so we need to get
+    # this from the root tag
+
+    m = re.match("^{(.*)}", str(root.tag))
+    if m == None: prefix = ""
+    else: prefix = "{" + m.group(1) + "}"
+
+# 'Events' are nested five deep, so we need five slashes in 'findall':
+#
+# <MTConnectStreams ...>
+#   <Streams>
+#     <DeviceStream name="M1" uuid="xxx">
+#       <ComponentStream component="Device" name="M1" componentId="M1">
+#         <Events>
+
+    for events in root.findall("./////" + prefix + "Events"):
+        for event in events:
+            m = re.match(prefix + "(.*)", str(event.tag))
+            if m == None: tag = event.tag
+            else: tag = m.group(1)
+            if DEBUG: print "mtconnect_client:", tag, ":", event.text
+            if tag == "ControllerMode":
+                name = event.attrib.get("name", None)
+                if name == "command": setCommand(event.text)
+                elif name == "cmdnum": setNumber(event.text)
+            elif tag == "Program":
+                name = event.attrib.get("name", None)
+                if name == "program": setProgram(event.text)
+
+    if newNumber():
+        print "mtconnect_client: got command", getCommand(), str(getNumber()), getProgram()
+        if getCommand() == "RESET":
+            try: client.sendall("! " + str(getNumber()) + " reset " + '\n')
+            except socket.error, msg:
+                print "mtconnect_client:", msg
+        elif getCommand() == "RUN":
+            try: client.sendall("! " + str(getNumber()) + " run " + getProgram() + '\n')
+            except socket.error, msg:
+                print "mtconnect_client:", msg
+
+# end of 'while doit'
+conn.close()
+
+print "mtconnect_client: done"
+
+sys.exit(retval)

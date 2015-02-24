@@ -1,0 +1,43 @@
+#!/bin/sh
+
+# Tests stopping of trans- and rot move
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > out1
+tpar 1 2 3
+rpar 1 1 1
+linear
+vel
+movew 0 0 0 0 0 0
+movew 0.1 -0.2 0.3 1 -2 3
+movew 0 0 0 0 0 0
+run
+EOF
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > out2
+tpar 1 2 3
+rpar 1 1 1
+linear
+vel
+movew 0 0 0 0 0 0
+movew 0.1 -0.2 0.3 1 -2 3
+run 100
+stop
+run
+movew 0 0 0 0 0 0
+run
+EOF
+
+echo "set title '$title' ; plot 'out1' using 1:2 with linespoints title 'X', '' using 1:3 with linespoints title 'Y', '' using 1:4 with linespoints title 'Z', '' using 1:5 with linespoints title 'Roll', '' using 1:6 with linespoints title 'Pitch', '' using 1:7 with linespoints title 'Yaw'" | gnuplot -persist
+
+echo "set title '$title' ; plot 'out2' using 1:2 with linespoints title 'X', '' using 1:3 with linespoints title 'Y', '' using 1:4 with linespoints title 'Z', '' using 1:5 with linespoints title 'Roll', '' using 1:6 with linespoints title 'Pitch', '' using 1:7 with linespoints title 'Yaw'" | gnuplot -persist
+
+cat <<EOF
+This a plot of normal motion v. time, and one of the same mtion when stopped.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

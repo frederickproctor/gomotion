@@ -1,0 +1,24 @@
+#!/bin/sh
+
+cd `dirname $0`
+
+./testcaj
+./testcirc
+./testhelix
+./testjog
+./testjointtime
+./testjstop
+./testklcq
+./testmot
+./testscale
+./testsm
+./testspiral
+./teststop
+./teststopcirc
+./testujoint
+./testvel
+./testworld
+./testtime
+
+exit 0
+

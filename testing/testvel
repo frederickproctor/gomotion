@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Shows the velocity profile of a typical move
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > out
+tpar 1 1.5 5
+linear
+vel
+movew 0 0 0 0 0 0
+movew 1.5 0 0 0 0 0
+run
+EOF
+
+echo "set title '$title' ; plot 'out' using 1:2 title 'X Velocity'" | gnuplot -persist
+
+cat <<EOF
+This shows velocity v. time for a single motion.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0

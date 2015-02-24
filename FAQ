@@ -1,0 +1,59 @@
+FAQ
+---
+1. How do I fix this error:
+
+can't get servo comm shm
+
+You need to make the shared memory device. Run rtlib/SETUP or do this:
+
+sudo mknod -m 666 /dev/rtai_shm c 10 254
+
+Also do the FIFOs while you're at it:
+
+for n in 0 1 2 3 4 5 6 7 8 9 ; do sudo mknod -m 666 /dev/rtf$n c 150 $n ; done
+
+2. How do I fix this error:
+
+insmod: error inserting '../rtlib/gomain_mod.ko': -1 Unknown symbol in module
+
+You need to run the RTAI modules. Do this: 
+
+	bin/insrtl
+
+It's normally part of the bin/run script.
+
+3. How do I set up the Sensoray 626?
+
+cd to drivers/s626-0.3 or a newer version and follow the README
+instructions, probably something like this:
+
+	make clean
+	make
+	make install
+	make lib
+
+You should end up with 'libs626.a', which is what the Go configure
+script looks for when checking for Sensoray 626 support.
+
+Then, 
+
+sudo modprobe s626
+
+4. How do I fix this error:
+
+"Can't find a usable init.tcl in the following directories"
+
+when running the Tcl/Tk pendant GUI?
+
+Set the TCL_LIBRARY env var to point to where init.tcl is located, e.g., 
+
+export TCL_LIBRARY=c:/cygwin/usr/share/tcl8.4
+
+5. How do I fix this error:
+
+shmget: Invalid argument
+
+This means that shared memory from a previous run is still lying
+around, and the size has changed for the new run. Run "ipc-clear" to
+get rid of the previous shared memory.
+

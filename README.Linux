@@ -1,0 +1,84 @@
+Quick Start Guide to building and demoing Go Motion for Linux
+-------------------------------------------------------------
+The INSTALL file has general instructions for compiling software built
+using Autotools, as Go Motion has been. A summary, and more specific
+instructions, follow here. 
+
+1. Obtain and unpack the Go Motion distribution, which you have
+probably already done if you're reading this README. This would have
+been something like this:
+
+you> tar xzvf gomotion-1.X.tar.gz
+you> cd gomotion-1.X
+you> ./configure
+you> make
+
+This builds a non-real-time version of Go Motion.
+
+2. Run the demo, which is based on a parallel kinematic cable robot: 
+
+you> bin/gorun -i etc/genhex.ini
+
+You may see a bunch of diagnostics print out, then a window will pop
+up titled "Go Motion" that shows the position values and has some
+buttons for moving the robot around. This is the graphical pendant, a
+substitute for a real robot pendant you would use on a real industrial
+robot.
+
+3. At the pendant, click the radio button next to the joint position
+labeled "1" near the upper left, then click the "Home" button near the
+middle. This will move the joint to its home position, and the digits
+will turn from red to black. Do the same for joints 2-6. 
+
+4. Click the radio button labeled "World" in the row below the
+position digits. The position will display XYZ RPW Cartesian
+coordinates. 
+
+5. Select the "Z" axis radio button, then jog it up and down with the
+"Jog-" and "Jog+" buttons. You should see the Z position numbers
+change accordingly. The position can't be jogged past the software
+limits, so if it looks like it's not responding, jog the other way and
+get off the limit. 
+
+6. Click the "Move..." button to pop up a window into which you can
+type target XYZ RPW coordinates (in mm and degrees), and a time for
+the motion to complete. Fill in some numbers close to what's there,
+put in a time of 1, and click "Write". The position should show motion
+to the desired target in about the desired time. Click "Done" to
+dismiss the Move window. 
+
+7. The motion likely took longer, since the speeds are clamped to
+limits set in the etc/gomotion.ini file. It also took longer since
+this demo is not running in real time. 
+
+8. If you have set up real-time Linux, you can build a real-time
+version like this:
+
+you> ./build
+
+This will compile kernel modules into the rtlib/ directory. The
+"gorun" script you ran earlier will look for these, and run real-time
+Linux if available. 
+
+9. The selection of which drivers to use is made in the various
+Makefiles, either bin/Makefile.am or rtlib/Makefile. If you want to
+change these, you'll need to edit these files, run the "bootstrap"
+script to re-generate the Makefiles, and the "build" script to
+compile, e.g., 
+
+you> echo I just edited some files
+you> ./autoconf.sh
+you> ./build
+you> bin/gorun -i gomotion.ini
+
+10. You'll now want to customize Go Motion for your device. Create
+your own .ini file based on gomotion.ini, and change the parameters
+according to the configuration of your own device. Comments in the
+.ini file can help. 
+
+See the HTML documentation in doxygen-doc/html/index.html for many
+more details on the software. 
+
+11. To run the task controller, bring up gosh and try this:
+
+task> start bin/gotk scripts/raster.tcl -- -i etc/genhex.ini

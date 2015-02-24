@@ -1,0 +1,28 @@
+#!/bin/sh
+
+# Tests world motion
+
+title=`basename $0`
+cd `dirname $0`/../bin
+
+cat << EOF | ./gotestsh -t 0.01 -n 1 > out
+tpar 10 10 100
+rpar 10 30 90
+linear
+pos
+movew 0 0 0 0 0 0
+movew 15 -30 0 0 -20 60
+movew 15 -30 45 10 -20 60
+movew 0 0 0 0 0 0
+run
+EOF
+
+echo "set title '$title' ; plot 'out' using 1:2 with linespoints title 'X', '' using 1:3 with linespoints title 'Y', '' using 1:4 with linespoints title 'Z', '' using 1:5 with linespoints title 'Roll', '' using 1:6 with linespoints title 'Pitch', '' using 1:7 with linespoints title 'Yaw'" | gnuplot -persist
+
+cat <<EOF
+This tests world motion for all of XYZ RPW, showing position v. time.
+Hit 'q' to quit the displays, 'ENTER' to continue...
+EOF
+read input
+
+exit 0
