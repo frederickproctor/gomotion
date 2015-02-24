@@ -406,7 +406,7 @@ AC_DEFUN([ACX_GOMOTION],
 	[AC_MSG_CHECKING([for Go Motion])]
 	[AC_ARG_WITH(gomotion,
 		[ --with-gomotion=<path to Go Motion>  Specify path to Go Motion directory],
-		dirs=$withval,dirs="/usr/local/gomotion /usr/local/src/gomotion $HOME/gomotion")]
+		dirs=$withval,dirs="/usr/local /usr/local/gomotion /usr/local/src/gomotion $HOME/gomotion")]
 	for dir in $dirs ; do
 		if test -f $dir/include/go.h ; then GOMOTION_DIR=$dir ; break ; fi
 	done
