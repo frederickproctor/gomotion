@@ -58,7 +58,7 @@
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ulapilib.lib;tcl85.lib;tk85.lib;wsock32.lib;golib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ulapi.lib;tcl85.lib;tk85.lib;wsock32.lib;golib.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files\ulapi\lib;C:\Tcl\lib;..\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>LIBCMT.LIB;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
