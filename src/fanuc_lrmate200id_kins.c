@@ -94,7 +94,7 @@ go_result fanuc_lrmate200id_kin_fwd(fanuc_lrmate200id_kin_struct *kins,
   /* gearing equations */
   joints[0] = motors[0];
   joints[1] = motors[1] - GO_PI_2;
-  joints[2] = motors[1] + motors[2];
+  joints[2] = -(motors[1] + motors[2]);
   joints[3] = -motors[3];
   joints[4] = -motors[4];
   joints[5] = -motors[5];
@@ -126,7 +126,7 @@ go_result fanuc_lrmate200id_kin_inv(fanuc_lrmate200id_kin_struct *kins,
   /* gearing equations */
   motors[0] = joints[0];
   motors[1] = joints[1] + GO_PI_2;
-  motors[2] = joints[2] - motors[1];
+  motors[2] = -(joints[2] + motors[1]);
   motors[3] = -joints[3];
   motors[4] = -joints[4];
   motors[5] = -joints[5];
@@ -153,14 +153,14 @@ go_result fanuc_lrmate200id_kin_jac_fwd(fanuc_lrmate200id_kin_struct *kins,
   /* gearing equations */
   joints[0] = motors[0];
   joints[1] = motors[1] - GO_PI_2;
-  joints[2] = motors[1] + motors[2];
+  joints[2] = -(motors[1] + motors[2]);
   joints[3] = -motors[3];
   joints[4] = -motors[4];
   joints[5] = -motors[5];
   /* and their speeds */
   jointvels[0] = motorvels[0];
   jointvels[1] = motorvels[1];
-  jointvels[2] = motorvels[1] + motorvels[2];
+  jointvels[2] = -(motorvels[1] + motorvels[2]);
   jointvels[3] = -motorvels[3];
   jointvels[4] = -motorvels[4];
   jointvels[5] = -motorvels[5];
@@ -185,7 +185,7 @@ go_result fanuc_lrmate200id_kin_jac_inv(fanuc_lrmate200id_kin_struct *kins,
   /* convert the motor positions to joint positions */
   joints[0] = motors[0];
   joints[1] = motors[1] - GO_PI_2;
-  joints[2] = motors[1] + motors[2];
+  joints[2] = -(motors[1] + motors[2]);
   joints[3] = -motors[3];
   joints[4] = -motors[4];
   joints[5] = -motors[5];
@@ -197,7 +197,7 @@ go_result fanuc_lrmate200id_kin_jac_inv(fanuc_lrmate200id_kin_struct *kins,
   /* now convert the joint vels into motor vels */
   motorvels[0] = jointvels[0];
   motorvels[1] = jointvels[1];
-  motorvels[2] = jointvels[2] - motorvels[1];
+  motorvels[2] = -(jointvels[2] + motorvels[1]);
   motorvels[3] = -jointvels[3];
   motorvels[4] = -jointvels[4];
   motorvels[5] = -jointvels[5];
