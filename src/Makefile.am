@@ -1,6 +1,9 @@
 include_HEADERS = \
+canon.h \
 dcmotor.h \
 extintf.h \
+fanuc_lrmate200id_kins.h \
+fanuckins.h \
 genhexkins.h \
 genserkins.h \
 go.h \
@@ -17,13 +20,19 @@ gostepper.h \
 gotraj.h \
 gotypes.h \
 goutil.h \
+interplist.h \
 pid.h \
 pumakins.h \
 roboch.h \
+rs274ngc.h \
+rs274ngc_return.h \
+scarakins.h \
 servointf.h \
-trajintf.h \
+spheristkins.h \
 taskintf.h \
+three21kins.h \
 toolintf.h \
+trajintf.h \
 tripointkins.h \
 trivkins.h \
 variates.h

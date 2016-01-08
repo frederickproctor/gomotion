@@ -7,7 +7,6 @@ autom4te.cache/
 bin/.deps/
 bin/Makefile
 bin/Makefile.in
-bin/*.o
 bin/emu_galil
 bin/emu_smartmotor
 bin/gocfg
@@ -55,8 +54,8 @@ etc/Makefile.in
 lib/.deps/
 lib/Makefile
 lib/Makefile.in
-lib/*.o
 lib/*.a
 src/Makefile
 src/Makefile.in
+src/*.o
 ulapi_dir

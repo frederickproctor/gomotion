@@ -1,8 +1,8 @@
-AC_INIT(gomotion, 1.29)
+AC_INIT([gomotion], [1.29])
 AC_CONFIG_AUX_DIR([config])
-AM_INIT_AUTOMAKE(gomotion, 1.29)
 AC_CONFIG_SRCDIR([src/go.c])
 AC_CONFIG_HEADERS([config/config.h])
+AM_INIT_AUTOMAKE([subdir-objects])
 
 # Checks for programs.
 AC_PROG_CC

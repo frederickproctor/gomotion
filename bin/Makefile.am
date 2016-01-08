@@ -1,9 +1,13 @@
-INCLUDES = -I. -I@ULAPI_DIR@/include
+# INCLUDES = -I. -I@ULAPI_DIR@/include
+AM_CPPFLAGS = -I. -I@ULAPI_DIR@/include
+
 if HAVE_TK_INCLUDE
-INCLUDES += -I@TK_INCLUDE_DIR@
+# INCLUDES += -I@TK_INCLUDE_DIR@
+AM_CPPFLAGS += -I@TK_INCLUDE_DIR@
 endif
 if HAVE_SDL
-INCLUDES += @SDL_CFLAGS@
+# INCLUDES += @SDL_CFLAGS@
+AM_CPPFLAGS += @SDL_CFLAGS@
 endif
 
 EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup
@@ -163,7 +167,8 @@ endif
 
 if HAVE_S626
 
-INCLUDES += -I@S626_DIR@
+# INCLUDES += -I@S626_DIR@
+AM_CPPFLAGS += -I@S626_DIR@
 
 bin_PROGRAMS += gomain_s626
 
@@ -239,7 +244,8 @@ sixdof_DEPENDENCIES = ../lib/libgo.a
 endif
 
 if HAVE_MTCONNECT
-INCLUDES += -I@MTCONNECT_DIR@/include
+# INCLUDES += -I@MTCONNECT_DIR@/include
+AM_CPPFLAGS += -I@MTCONNECT_DIR@/include
 bin_PROGRAMS += go_adapter
 go_adapter_SOURCES = ../src/go_adapter.cpp ../src/go_adapter.hpp ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
 go_adapter_LDADD = ../lib/libgo.a @ULAPI_LIBS@ @MTCONNECT_LIBS@
