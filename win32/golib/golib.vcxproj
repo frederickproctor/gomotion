@@ -71,6 +71,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\fanuckins.c" />
+    <ClCompile Include="..\..\src\fanuc_lrmate200id_kins.c" />
     <ClCompile Include="..\..\src\genhexkins.c" />
     <ClCompile Include="..\..\src\genserkins.c" />
     <ClCompile Include="..\..\src\go.c" />
