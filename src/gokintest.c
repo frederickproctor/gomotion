@@ -303,6 +303,9 @@ int main(int argc, char *argv[])
   /* home joint position */
   go_real home_joint[MAX_JOINT_NUM];
 
+  go_flag fflags;
+  go_flag iflags;
+
   go_rpy rpy;			/* we use RPY when printing orientation */
   ulapi_real start, diff;
   double delta_t = 1.0e-3;
@@ -493,6 +496,11 @@ int main(int argc, char *argv[])
       continue;
     } else if (*ptr == 'f') {
       inverse = 0;
+      continue;
+    } else if (*ptr == 'F') {
+      go_kin_get_flags(kinematics, &fflags, &iflags);
+      printf("forward flags: 0x%X\n", fflags);
+      printf("inverse flags: 0x%X\n", iflags);
       continue;
     } else if (*ptr == 'j') {
       jacobian = 1;

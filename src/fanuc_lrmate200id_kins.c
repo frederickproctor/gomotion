@@ -204,3 +204,22 @@ go_result fanuc_lrmate200id_kin_jac_inv(fanuc_lrmate200id_kin_struct *kins,
 
   return GO_RESULT_OK;
 }
+
+go_result fanuc_lrmate200id_kin_set_flags(fanuc_lrmate200id_kin_struct *kins,
+					  go_flag fflags,
+					  go_flag iflags)
+{
+  kins->tk.iflags = iflags;
+
+  return GO_RESULT_OK;
+}
+
+go_result fanuc_lrmate200id_kin_get_flags(fanuc_lrmate200id_kin_struct *kins,
+					  go_flag *fflags,
+					  go_flag *iflags)
+{
+  *fflags = 0;			/* no forward flags */
+  *iflags = kins->tk.iflags;
+
+  return GO_RESULT_OK;
+}

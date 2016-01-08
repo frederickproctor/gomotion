@@ -365,3 +365,26 @@ go_result go_kin_jac_fwd(void * kins,
 
   return triv_kin_jac_fwd(kins, joints, jointvels, pos, vel);
 }
+
+go_result go_kin_set_flags(void *kins,
+			   go_flag fflags,
+			   go_flag iflags)
+{
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_set_flags(kins, fflags, iflags);
+
+  /* others are not yet implemented -- to do */
+  return GO_RESULT_IMPL_ERROR;
+}
+
+go_result go_kin_get_flags(void *kins,
+			   go_flag *fflags,
+			   go_flag *iflags)
+{
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_get_flags(kins, fflags, iflags);
+
+  /* ditto */
+  return GO_RESULT_IMPL_ERROR;
+}
+

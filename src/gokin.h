@@ -74,18 +74,22 @@ extern go_result go_kin_init(void * kins);
    to go_kin_set_parameters */
 extern go_integer go_kin_num_joints(void * kins);
 
-/* the forward kinematics take joint values and determine world coordinates,
+/* 
+   The forward kinematics take joint values and determine world coordinates,
    using any forward kinematics flags to resolve any ambiguities. The inverse
    flags are set to indicate their value appropriate to the joint values
-   passed in. */
+   passed in.
+*/
 extern go_result go_kin_fwd(void * kins,
 			    const go_real *joint,
 			    go_pose * world);
 
-/* the inverse kinematics take world coordinates and determine joint values,
-   given the inverse kinematics flags to resolve any ambiguities. The forward
-   flags are set to indicate their value appropriate to the world coordinates
-   passed in. */
+/*
+  The inverse kinematics take world coordinates and determine joint values,
+  given the inverse kinematics flags to resolve any ambiguities. The forward
+  flags are set to indicate their value appropriate to the world coordinates
+  passed in.
+*/
 extern go_result go_kin_inv(void * kins,
 			    const go_pose * world,
 			    go_real *joints);
@@ -106,6 +110,14 @@ extern go_result go_kin_jac_fwd(void * kins,
 				const go_real * jointvels,
 				const go_pose * pos,
 				go_vel * vel);
+
+extern go_result go_kin_set_flags(void *kins,
+				  go_flag fflags,
+				  go_flag iflags);
+
+extern go_result go_kin_get_flags(void *kins,
+				  go_flag *fflags,
+				  go_flag *iflags);
 
 #if 0
 {

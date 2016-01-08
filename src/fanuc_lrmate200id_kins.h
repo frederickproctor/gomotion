@@ -60,6 +60,14 @@ extern go_result fanuc_lrmate200id_kin_jac_fwd(fanuc_lrmate200id_kin_struct *kin
 					       const go_pose *pos, 
 					       go_vel *vel); 
 
+extern go_result fanuc_lrmate200id_kin_set_flags(fanuc_lrmate200id_kin_struct *kins,
+						 go_flag fflags,
+						 go_flag iflags);
+
+extern go_result fanuc_lrmate200id_kin_get_flags(fanuc_lrmate200id_kin_struct *kins,
+						 go_flag *fflags,
+						 go_flag *iflags);
+
 #if 0
 {
 #endif
