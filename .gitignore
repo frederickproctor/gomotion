@@ -55,6 +55,8 @@ lib/.deps/
 lib/Makefile
 lib/Makefile.in
 lib/*.a
+src/.deps
+src/.dirstamp
 src/Makefile
 src/Makefile.in
 src/*.o
