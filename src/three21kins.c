@@ -169,8 +169,8 @@ go_result three21_kin_get_parameters(three21_kin_struct *kins, go_link *params, 
 
   params[5].quantity = GO_QUANTITY_ANGLE;
   params[5].type = GO_LINK_DH;
-  params[5].u.dh.a = -GO_PI_2;
-  params[5].u.dh.alpha = 0;
+  params[5].u.dh.a = 0;
+  params[5].u.dh.alpha = -GO_PI_2;
   params[5].u.dh.d = 0;
   params[5].u.dh.theta = 0;
 
