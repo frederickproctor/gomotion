@@ -4,6 +4,18 @@
 
 int main(int argc, char *argv[])
 {
+  go_mat mat;
+  go_quat quat = {0, 1, 0, 0};
+
+  go_quat_mat_convert(&quat, &mat);
+
+  go_mat_print(&mat);
+
+  return 0;
+}
+
+int main_1(int argc, char *argv[])
+{
   double d1, d2;
   go_real th4in, th5in;
   go_cart zin;

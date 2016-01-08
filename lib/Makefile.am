@@ -9,6 +9,7 @@ libgokin_a_SOURCES = \
 ../src/genserkins.c ../src/genserkins.h \
 ../src/pumakins.c ../src/pumakins.h \
 ../src/fanuckins.c ../src/fanuckins.h \
+../src/fanuc_lrmate200id_kins.c ../src/fanuc_lrmate200id_kins.h \
 ../src/scarakins.c ../src/scarakins.h \
 ../src/tripointkins.c ../src/tripointkins.h \
 ../src/spheristkins.c ../src/spheristkins.h \

@@ -889,3 +889,48 @@ go_result puma_kin_jac_inv(void *kins,
 
   return go_mat6_vec6_mult(inv, velvec, jointvels);
 }
+
+/* extensions */
+
+go_result puma_kin_jac_transpose(void *kins,
+				 const go_pose *pos,
+				 const go_vel *ft,
+				 const go_real *their_joints,
+				 go_real *joint_ft)
+{
+  go_real mat[6][6];
+  go_real transpose[6][6];
+  go_real our_joints[6];
+  go_real *joints;
+  go_real ftvec[6];
+  go_result retval;
+
+  if (their_joints == NULL) {
+    retval = puma_kin_inv(kins, pos, our_joints);
+    if (GO_RESULT_OK != retval) {
+      return retval;
+    }
+    joints = our_joints;
+  } else {
+    joints = (go_real *) their_joints;
+  }
+
+  retval = jac_fwd_mat(kins, joints, mat);
+  if (GO_RESULT_OK != retval) {
+    return retval;
+  }
+
+  retval = go_mat6_transpose(mat, transpose);
+  if (GO_RESULT_OK != retval) {
+    return retval;
+  }
+
+  ftvec[0] = ft->v.x;
+  ftvec[1] = ft->v.y;
+  ftvec[2] = ft->v.z;
+  ftvec[3] = ft->w.x;
+  ftvec[4] = ft->w.y;
+  ftvec[5] = ft->w.z;
+
+  return go_mat6_vec6_mult(transpose, ftvec, joint_ft);
+}

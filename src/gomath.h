@@ -964,6 +964,13 @@ extern go_result go_mat6_inv(go_real a[6][6],
 			     go_real ainv[6][6]);
 
 /*!
+  Given a 6x6 matrix \a a, generates the transpose and returns it in
+  \a at. Leaves \a a untouched. Returns GO_RESULT_OK.
+*/
+extern go_result go_mat6_transpose(go_real a[6][6],
+				   go_real at[6][6]);
+
+/*!
   Given two 6x6 matrices \a a and \a b, multiplies them and returns
   the result in \a axb. Leaves \a a and \a b untouched.
   Returns GO_RESULT_OK.

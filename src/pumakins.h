@@ -76,6 +76,14 @@ extern go_result puma_kin_jac_fwd(void *kins,
 				  const go_pose *pos,
 				  go_vel *vel);
 
+/* extensions */
+
+extern go_result puma_kin_jac_transpose(void *kins,
+					const go_pose *pos,
+					const go_vel *ft,
+					const go_real *their_joints,
+					go_real *joint_ft);
+
 #if 0
 {
 #endif

@@ -15,6 +15,7 @@
 #include "genhexkins.h"
 #include "genserkins.h"
 #include "fanuckins.h"
+#include "fanuc_lrmate200id_kins.h"
 #include "pumakins.h"
 #include "scarakins.h"
 #include "trivkins.h"
@@ -26,6 +27,7 @@ static enum {
   USE_GENHEXKINS,
   USE_GENSERKINS,
   USE_FANUCKINS,
+  USE_FANUC_LRMATE200ID_KINS,
   USE_PUMAKINS,
   USE_SCARAKINS,
   USE_TRIPOINTKINS,
@@ -57,6 +59,10 @@ go_result go_kin_select(const char * name)
   }
   if (strmatch(name, fanuc_kin_get_name())) {
     go_kin_which = USE_FANUCKINS;
+    return GO_RESULT_OK;
+  }
+  if (strmatch(name, fanuc_lrmate200id_kin_get_name())) {
+    go_kin_which = USE_FANUC_LRMATE200ID_KINS;
     return GO_RESULT_OK;
   }
   if (strmatch(name, puma_kin_get_name())) {
@@ -92,6 +98,8 @@ go_integer go_kin_size(void)
     return genser_kin_size();
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_size();
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_size();
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_size();
   if (go_kin_which == USE_SCARAKINS)
@@ -114,6 +122,8 @@ go_result go_kin_init(void * kins)
     return genser_kin_init(kins);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_init(kins);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_init(kins);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_init(kins);
   if (go_kin_which == USE_SCARAKINS)
@@ -136,6 +146,8 @@ const char * go_kin_get_name(void)
     return genser_kin_get_name();
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_get_name();
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_get_name();
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_get_name();
   if (go_kin_which == USE_SCARAKINS)
@@ -158,6 +170,8 @@ go_integer go_kin_num_joints(void * kins)
     return genser_kin_num_joints(kins);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_num_joints(kins);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_num_joints(kins);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_num_joints(kins);
   if (go_kin_which == USE_SCARAKINS)
@@ -182,6 +196,8 @@ go_result go_kin_fwd(void * kins,
     return genser_kin_fwd(kins, joint, world);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_fwd(kins, joint, world);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_fwd(kins, joint, world);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_fwd(kins, joint, world);
   if (go_kin_which == USE_SCARAKINS)
@@ -206,6 +222,8 @@ go_result go_kin_inv(void * kins,
     return genser_kin_inv(kins, world, joint);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_inv(kins, world, joint);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_inv(kins, world, joint);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_inv(kins, world, joint);
   if (go_kin_which == USE_SCARAKINS)
@@ -228,6 +246,8 @@ go_kin_type go_kin_get_type(void * kins)
     return genser_kin_get_type(kins);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_get_type(kins);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_get_type(kins);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_get_type(kins);
   if (go_kin_which == USE_SCARAKINS)
@@ -250,6 +270,8 @@ go_result go_kin_set_parameters(void * kins, go_link * params, go_integer num)
     return genser_kin_set_parameters(kins, params, num);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_set_parameters(kins, params, num);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_set_parameters(kins, params, num);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_set_parameters(kins, params, num);
   if (go_kin_which == USE_SCARAKINS)
@@ -272,6 +294,8 @@ go_result go_kin_get_parameters(void * kins, go_link * params, go_integer num)
     return genser_kin_get_parameters(kins, params, num);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_get_parameters(kins, params, num);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_get_parameters(kins, params, num);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_get_parameters(kins, params, num);
   if (go_kin_which == USE_SCARAKINS)
@@ -297,6 +321,8 @@ go_result go_kin_jac_inv(void * kins,
     return genser_kin_jac_inv(kins, pos, vel, joints, jointvels);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_jac_inv(kins, pos, vel, joints, jointvels);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_jac_inv(kins, pos, vel, joints, jointvels);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_jac_inv(kins, pos, vel, joints, jointvels);
   if (go_kin_which == USE_SCARAKINS)
@@ -324,6 +350,8 @@ go_result go_kin_jac_fwd(void * kins,
     return genser_kin_jac_fwd(kins, joints, jointvels, pos, vel);
   if (go_kin_which == USE_FANUCKINS)
     return fanuc_kin_jac_fwd(kins, joints, jointvels, pos, vel);
+  if (go_kin_which == USE_FANUC_LRMATE200ID_KINS)
+    return fanuc_lrmate200id_kin_jac_fwd(kins, joints, jointvels, pos, vel);
   if (go_kin_which == USE_PUMAKINS)
     return puma_kin_jac_fwd(kins, joints, jointvels, pos, vel);
   if (go_kin_which == USE_SCARAKINS)

@@ -3842,6 +3842,20 @@ go_result go_mat6_inv(go_real a[6][6],
   return GO_RESULT_OK;
 }
 
+go_result go_mat6_transpose(go_real a[6][6],
+			    go_real at[6][6])
+{
+  go_integer row, col;
+
+  for (row = 0; row < 6; row++) {
+    for (col = 0; col < 6; col++) {
+      at[row][col] = a[col][row];
+    }
+  }
+
+  return GO_RESULT_OK;
+}
+
 go_result go_mat6_mat6_mult(go_real a[6][6],
 			    go_real b[6][6],
 			    go_real axb[6][6])

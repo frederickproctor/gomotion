@@ -1,3 +1,9 @@
+1.29	8 January 2016
+	Added Fanuc LR Mate 200iD kinematics
+
+1.28	19 November 2015
+	Added go_mat6_transpose, and extension puma_kin_jac_transpose.
+
 1.27	23 February 2015
 	Added go_uxz for X-Z vector rotation representation.
 

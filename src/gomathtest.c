@@ -1305,6 +1305,29 @@ int test_atrigs()
   return 0;
 }
 
+int test_mat6_transpose()
+{
+  go_real a[6][6];
+  go_real at[6][6];
+  go_integer row, col;
+
+  for (row = 0; row < 6; row++) {
+    for (col = 0; col < 6; col++) {
+      a[row][col] = row*6 + col;
+    }
+  }
+
+  go_mat6_transpose(a, at);
+
+  for (row = 0; row < 6; row++) {
+    for (col = 0; col < 6; col++) {
+      if (a[row][col] != at[col][row]) return 1;
+    }
+  }
+
+  return 0;
+}
+
 /*
   Usage: gomathtest {<option number>}
 
@@ -1540,6 +1563,14 @@ int main(int argc, char *argv[])
   printf("test_atrigs: ");
   fflush(stdout);
   if (test_atrigs()) {
+    printf("failed\n");
+    return 1;
+  }
+  printf("ok\n");
+
+  printf("test_mat6_transpose: ");
+  fflush(stdout);
+  if (test_mat6_transpose()) {
     printf("failed\n");
     return 1;
   }
