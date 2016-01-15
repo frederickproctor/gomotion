@@ -580,13 +580,33 @@ go_result go_mat_zyx_convert(const go_mat *m, go_zyx *zyx)
     zyx->z = 0;
     zyx->y = GO_PI_2;		/* force it */
     zyx->x = atan2(m->y.x, m->y.y);
-  } else if (GO_ROT_CLOSE(zyx->y, GO_PI_2)) {
+  } else if (GO_ROT_CLOSE(zyx->y, -GO_PI_2)) {
     zyx->z = 0;
-    zyx->y = -GO_PI_2;		/* force it */
-    zyx->x = -atan2(m->y.z, m->y.y);
+    zyx->y = -GO_PI_2;
+    zyx->x = atan2(-m->y.x, m->y.y);
   } else {
     zyx->z = atan2(m->x.y, m->x.x);
     zyx->x = atan2(m->y.z, m->z.z);
+  }
+
+  return GO_RESULT_OK;
+}
+
+go_result go_mat_xyz_convert(const go_mat *m, go_xyz *xyz)
+{
+  xyz->y = atan2(m->z.x, sqrt(go_sq(m->x.x) + go_sq(m->y.x)));
+
+  if (GO_ROT_CLOSE(xyz->y, GO_PI_2)) {
+    xyz->x = 0;
+    xyz->y = GO_PI_2;
+    xyz->z = atan2(m->x.y, -m->x.z);
+  } else if (GO_ROT_CLOSE(xyz->y, -GO_PI_2)) {
+    xyz->x = 0;
+    xyz->y = -GO_PI_2;
+    xyz->z = atan2(m->x.y, m->x.z);
+  } else {
+    xyz->x = atan2(-m->z.y, m->z.z);
+    xyz->z = atan2(-m->y.x, m->x.x);
   }
 
   return GO_RESULT_OK;
@@ -750,6 +770,38 @@ go_result go_zyx_rpy_convert(const go_zyx *zyx, go_rpy *rpy)
   retval = go_zyx_mat_convert(zyx, &mat);
   if (GO_RESULT_OK != retval) return retval;
   return go_mat_rpy_convert(&mat, rpy);
+}
+
+go_result go_xyz_mat_convert(const go_xyz *xyz, go_mat *m)
+{
+  go_real s1, s2, s3;
+  go_real c1, c2, c3;
+
+  s1 = sin(xyz->x);
+  s2 = sin(xyz->y);
+  s3 = sin(xyz->z);
+
+  c1 = cos(xyz->x);
+  c2 = cos(xyz->y);
+  c3 = cos(xyz->z);
+
+  /*            |  m.x.x   m.y.x   m.z.x  | */
+  /* go_mat m = |  m.x.y   m.y.y   m.z.y  | */
+  /*            |  m.x.z   m.y.z   m.z.z  | */
+
+  m->x.x = c2*c3;
+  m->y.x = -c2*s3;
+  m->z.x = s2;
+
+  m->x.y = c1*s3 + s1*s2*c3;
+  m->y.y = c1*c3 - s1*s2*s3;
+  m->z.y = -c2*s1;
+
+  m->x.z = s1*s3 - c1*s2*c3;
+  m->y.z = s1*c3 + c1*s2*s3;
+  m->z.z = c1*c2;
+
+  return GO_RESULT_OK;
 }
 
 go_result go_rpy_rvec_convert(const go_rpy *rpy, go_rvec *rvec)
@@ -3080,6 +3132,7 @@ go_result go_quat_matrix_convert(const go_quat *quat,
 /*            |  m.x.x   m.y.x   m.z.x  | */
 /* go_mat m = |  m.x.y   m.y.y   m.z.y  | */
 /*            |  m.x.z   m.y.z   m.z.z  | */
+
 /* go_matrix mout[row][col]               */
 
 go_result go_mat_matrix_convert(const go_mat *mat,

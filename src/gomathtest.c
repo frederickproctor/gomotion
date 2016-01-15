@@ -1328,6 +1328,43 @@ int test_mat6_transpose()
   return 0;
 }
 
+#define GEN_ANG ((GO_PI - 0.1) * go_random() - (GO_PI_2 - 0.05))
+
+int test_eulers()
+{
+  go_zyx zyx, zyx_;
+  go_xyz xyz, xyz_;
+  go_mat mat;
+  go_integer i;
+
+  for (i = 0; i < 1000; i++) {
+    zyx.z = xyz.x = GEN_ANG;
+    zyx.y = xyz.y = GEN_ANG;
+    zyx.x = xyz.z = GEN_ANG;
+
+    go_zyx_mat_convert(&zyx, &mat);
+    go_mat_zyx_convert(&mat, &zyx_);
+
+    if (! GO_CLOSE(zyx.z, zyx_.z) ||
+	! GO_CLOSE(zyx.y, zyx_.y) ||
+	! GO_CLOSE(zyx.x, zyx_.x)) {
+      return 1;
+    }
+
+    go_xyz_mat_convert(&xyz, &mat);
+    go_mat_xyz_convert(&mat, &xyz_);
+
+    if (! GO_CLOSE(xyz.z, xyz_.z) ||
+	! GO_CLOSE(xyz.y, xyz_.y) ||
+	! GO_CLOSE(xyz.x, xyz_.x)) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+
 /*
   Usage: gomathtest {<option number>}
 
@@ -1571,6 +1608,14 @@ int main(int argc, char *argv[])
   printf("test_mat6_transpose: ");
   fflush(stdout);
   if (test_mat6_transpose()) {
+    printf("failed\n");
+    return 1;
+  }
+  printf("ok\n");
+
+  printf("test_eulers: ");
+  fflush(stdout);
+  if (test_eulers()) {
     printf("failed\n");
     return 1;
   }

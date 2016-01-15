@@ -428,6 +428,15 @@ typedef struct {
   go_real x;
 } go_zyx;
 
+/*! XYZ Euler angles. \a x is the amount of the first rotation around the
+  X axis. \a y is the amount of the second rotation around the new \a Y
+  axis. \a z is the amount of the third rotation around the new \a Z axis. */
+typedef struct {
+  go_real x;
+  go_real y;
+  go_real z;
+} go_xyz;
+
 /*! Roll-pitch-yaw angles. \a r is the amount of the first rotation
   (roll) around the X axis. \a p is the amount of the second rotation
   (pitch) around the original Y axis.  \a y is the amount of the third
@@ -597,37 +606,50 @@ extern go_result go_rvec_quat_convert(const go_rvec *, go_quat *);
 extern go_result go_rvec_mat_convert(const go_rvec *, go_mat *);
 extern go_result go_rvec_zyz_convert(const go_rvec *, go_zyz *);
 extern go_result go_rvec_zyx_convert(const go_rvec *, go_zyx *);
+extern go_result go_rvec_xyz_convert(const go_rvec *, go_xyz *);
 extern go_result go_rvec_rpy_convert(const go_rvec *, go_rpy *);
 
 extern go_result go_quat_rvec_convert(const go_quat *, go_rvec *);
 extern go_result go_quat_mat_convert(const go_quat *, go_mat *);
 extern go_result go_quat_zyz_convert(const go_quat *, go_zyz *);
 extern go_result go_quat_zyx_convert(const go_quat *, go_zyx *);
+extern go_result go_quat_xyz_convert(const go_quat *, go_xyz *);
 extern go_result go_quat_rpy_convert(const go_quat *, go_rpy *);
 
 extern go_result go_mat_rvec_convert(const go_mat *, go_rvec *);
 extern go_result go_mat_quat_convert(const go_mat *, go_quat *);
 extern go_result go_mat_zyz_convert(const go_mat *, go_zyz *);
 extern go_result go_mat_zyx_convert(const go_mat *, go_zyx *);
+extern go_result go_mat_xyz_convert(const go_mat *, go_xyz *);
 extern go_result go_mat_rpy_convert(const go_mat *, go_rpy *);
 
 extern go_result go_zyz_rvec_convert(const go_zyz *, go_rvec *);
 extern go_result go_zyz_quat_convert(const go_zyz *, go_quat *);
 extern go_result go_zyz_mat_convert(const go_zyz *, go_mat *);
 extern go_result go_zyz_zyx_convert(const go_zyz *, go_zyx *);
+extern go_result go_zyz_xyz_convert(const go_zyz *, go_xyz *);
 extern go_result go_zyz_rpy_convert(const go_zyz *, go_rpy *);
 
 extern go_result go_zyx_rvec_convert(const go_zyx *, go_rvec *);
 extern go_result go_zyx_quat_convert(const go_zyx *, go_quat *);
 extern go_result go_zyx_mat_convert(const go_zyx *, go_mat *);
 extern go_result go_zyx_zyz_convert(const go_zyx *, go_zyz *);
+extern go_result go_zyx_xyz_convert(const go_zyx *, go_xyz *);
 extern go_result go_zyx_rpy_convert(const go_zyx *, go_rpy *);
+
+extern go_result go_xyz_rvec_convert(const go_xyz *, go_rvec *);
+extern go_result go_xyz_quat_convert(const go_xyz *, go_quat *);
+extern go_result go_xyz_mat_convert(const go_xyz *, go_mat *);
+extern go_result go_xyz_zyz_convert(const go_xyz *, go_zyz *);
+extern go_result go_xyz_zyx_convert(const go_xyz *, go_zyx *);
+extern go_result go_xyz_rpy_convert(const go_xyz *, go_rpy *);
 
 extern go_result go_rpy_rvec_convert(const go_rpy *, go_rvec *);
 extern go_result go_rpy_quat_convert(const go_rpy *, go_quat *);
 extern go_result go_rpy_mat_convert(const go_rpy *, go_mat *);
 extern go_result go_rpy_zyz_convert(const go_rpy *, go_zyz *);
 extern go_result go_rpy_zyx_convert(const go_rpy *, go_zyx *);
+extern go_result go_rpy_xyz_convert(const go_rpy *, go_xyz *);
 
 extern go_result go_uxz_mat_convert(const go_uxz *, go_mat *);
 extern go_result go_mat_uxz_convert(const go_mat *, go_uxz *);
