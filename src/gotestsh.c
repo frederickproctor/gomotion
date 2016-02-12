@@ -38,13 +38,14 @@
 #include <stdlib.h>		/* free, strtod,l */
 #include <string.h>		/* strncmp */
 #include <ctype.h>		/* isspace */
-#include <unistd.h>		/* getopt, opterr */
+#include <unistd.h>		/* ulapi_getopt, opterr */
 
 #ifdef HAVE_READLINE_READLINE_H
 #include <readline/readline.h>	/* readline */
 #include <readline/history.h>	/* using_history */
 #endif
 
+#include <ulapi.h>
 #include "go.h"
 
 /* find all of 'a' in 'b', and following chars of 'b' are space or 0 */
@@ -187,31 +188,31 @@ int main(int argc, char *argv[])
   movetime = -1.0;
   interp_count = 10;
 
-  opterr = 0;			/* inhibit automatic getopt error printing */
+  opterr = 0;			/* inhibit automatic ulapi_getopt error printing */
   while (1) {
-    option = getopt(argc, argv, ":p:t:n:");
+    option = ulapi_getopt(argc, argv, ":p:t:n:");
     if (option == -1)
       break;
 
     switch (option) {
     case 't':
-      deltat = strtod(optarg, NULL);
+      deltat = strtod(ulapi_optarg, NULL);
       break;
     case 'n':
-      interp_count = strtol(optarg, NULL, 10);
+      interp_count = strtol(ulapi_optarg, NULL, 10);
       break;
     case ':':
       /* missing option argument */
-      fprintf(stderr, "missing argument to -%c\n", (char) optopt);
+      fprintf(stderr, "missing argument to -%c\n", (char) ulapi_optopt);
       return 1;
     case '?':
       /* unrecognized argument */
-      fprintf(stderr, "unrecognized option -%c\n", (char) optopt);
+      fprintf(stderr, "unrecognized option -%c\n", (char) ulapi_optopt);
       return 1;
     }
   }
-  if (argc > optind) {
-    fprintf(stderr, "unrecognized argument %s\n", argv[optind]);
+  if (argc > ulapi_optind) {
+    fprintf(stderr, "unrecognized argument %s\n", argv[ulapi_optind]);
     return 1;
   }
   if (deltat < GO_REAL_EPSILON) {

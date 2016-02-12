@@ -298,25 +298,25 @@ int main(int argc, char *argv[])
 
   opterr = 0;
   while (1) {
-    option = getopt(argc, argv, ":i:u:swd?");
+    option = ulapi_getopt(argc, argv, ":i:u:swd?");
     if (option == -1)
       break;
 
     switch (option) {
     case 'i':
-      strncpy(inifile_name, optarg, sizeof(inifile_name));
+      strncpy(inifile_name, ulapi_optarg, sizeof(inifile_name));
       inifile_name[sizeof(inifile_name) - 1] = 0;
       break;
 
     case 'u':
-      if (! strcmp(optarg, "unix")) {
+      if (! strcmp(ulapi_optarg, "unix")) {
 	which_ulapi = USE_UNIX;
 	ularg = "-u unix";
-      } else if (! strcmp(optarg, "rtai")) {
+      } else if (! strcmp(ulapi_optarg, "rtai")) {
 	which_ulapi = USE_RTAI;
 	ularg = "-u rtai";
       } else {
-	fprintf(stderr, "gorun: invalid target for -%c: %s\n", option, optarg);
+	fprintf(stderr, "gorun: invalid target for -%c: %s\n", option, ulapi_optarg);
 	return 1;
       }
       break;
@@ -339,18 +339,18 @@ int main(int argc, char *argv[])
       break;
 
     case ':':
-      fprintf(stderr, "gorun: missing value for -%c\n", optopt);
+      fprintf(stderr, "gorun: missing value for -%c\n", ulapi_optopt);
       return 1;
       break;
 
     default:			/* '?' */
-      fprintf (stderr, "gorun: unrecognized option -%c\n", optopt);
+      fprintf (stderr, "gorun: unrecognized option -%c\n", ulapi_optopt);
       return 1;
       break;
     }
   }
-  if (optind < argc) {
-    fprintf(stderr, "gorun: extra non-option characters: %s\n", argv[optind]);
+  if (ulapi_optind < argc) {
+    fprintf(stderr, "gorun: extra non-option characters: %s\n", argv[ulapi_optind]);
     return 1;
   }
 

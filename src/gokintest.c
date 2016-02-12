@@ -322,34 +322,34 @@ int main(int argc, char *argv[])
 
   opterr = 0;
   while (1) {
-    option = getopt(argc, argv, ":i:k:");
+    option = ulapi_getopt(argc, argv, ":i:k:");
     if (option == -1)
       break;
 
     switch (option) {
     case 'i':
-      strncpy(inifile_name, optarg, BUFFERLEN);
+      strncpy(inifile_name, ulapi_optarg, BUFFERLEN);
       inifile_name[BUFFERLEN - 1] = 0;
       break;
 
     case 'k':
-      strncpy(kin_name, optarg, BUFFERLEN);
+      strncpy(kin_name, ulapi_optarg, BUFFERLEN);
       kin_name[BUFFERLEN - 1] = 0;
       break;
 
     case ':':
-      fprintf(stderr, "missing value for -%c\n", optopt);
+      fprintf(stderr, "missing value for -%c\n", ulapi_optopt);
       return 1;
       break;
 
     default:			/* '?' */
-      fprintf (stderr, "unrecognized option -%c\n", optopt);
+      fprintf (stderr, "unrecognized option -%c\n", ulapi_optopt);
       return 1;
       break;
     }
   }
-  if (optind < argc) {
-    fprintf(stderr, "extra non-option characters: %s\n", argv[optind]);
+  if (ulapi_optind < argc) {
+    fprintf(stderr, "extra non-option characters: %s\n", argv[ulapi_optind]);
     return 1;
   }
 

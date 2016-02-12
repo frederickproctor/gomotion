@@ -449,34 +449,34 @@ int main(int argc, char *argv[])
 
   opterr = 0;
   for (;;) {
-    option = getopt(argc, argv, ":i:u:r:w:q:p:h:nszad:");
+    option = ulapi_getopt(argc, argv, ":i:u:r:w:q:p:h:nszad:");
     if (option == -1)
       break;
 
     switch (option) {
     case 'i':
-      strncpy(inifile_name, optarg, BUFFERLEN);
+      strncpy(inifile_name, ulapi_optarg, BUFFERLEN);
       inifile_name[BUFFERLEN - 1] = 0;
       break;
 
     case 'r':
-      read_period = (ulapi_real) atof(optarg);
+      read_period = (ulapi_real) atof(ulapi_optarg);
       break;
 
     case 'w':
-      write_period = (ulapi_real) atof(optarg);
+      write_period = (ulapi_real) atof(ulapi_optarg);
       break;
 
     case 'q':
-      queue_period = (ulapi_real) atof(optarg);
+      queue_period = (ulapi_real) atof(ulapi_optarg);
       break;
 
     case 'p':
-      port = atoi(optarg);
+      port = atoi(ulapi_optarg);
       break;
 
     case 'h':
-      strncpy(host, optarg, sizeof(host));
+      strncpy(host, ulapi_optarg, sizeof(host));
       host[sizeof(host) - 1] = 0;
       break;
 
@@ -497,25 +497,25 @@ int main(int argc, char *argv[])
       break;
 
     case 'd':
-      if (1 != sscanf(optarg, "%i", &debug_mask)) {
-	fprintf (stderr, "bad value for -%c: %s\n", option, optarg);
+      if (1 != sscanf(ulapi_optarg, "%i", &debug_mask)) {
+	fprintf (stderr, "bad value for -%c: %s\n", option, ulapi_optarg);
 	return 1;
       }
       break;
 
     case ':':
-      fprintf(stderr, "missing value for -%c\n", optopt);
+      fprintf(stderr, "missing value for -%c\n", ulapi_optopt);
       return 1;
       break;
 
     default:			/* '?' */
-      fprintf (stderr, "unrecognized option -%c\n", optopt);
+      fprintf (stderr, "unrecognized option -%c\n", ulapi_optopt);
       return 1;
       break;
     }
   }
-  if (optind < argc) {
-    fprintf(stderr, "extra non-option characters: %s\n", argv[optind]);
+  if (ulapi_optind < argc) {
+    fprintf(stderr, "extra non-option characters: %s\n", argv[ulapi_optind]);
     return 1;
   }
 

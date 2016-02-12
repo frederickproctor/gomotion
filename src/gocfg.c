@@ -211,18 +211,18 @@ static void dbprintf(int prefix, const char * fmt, ...)
 
    opterr = 0;
    while (1) {
-     option = getopt(argc, argv, ":i:u:s:c:d");
+     option = ulapi_getopt(argc, argv, ":i:u:s:c:d");
      if (option == -1)
        break;
 
      switch (option) {
      case 'i':
-       strncpy(inifile_name, optarg, BUFFERLEN);
+       strncpy(inifile_name, ulapi_optarg, BUFFERLEN);
        inifile_name[BUFFERLEN - 1] = 0;
        break;
 
      case 't':
-       wait_time = strtod(optarg, NULL);
+       wait_time = strtod(ulapi_optarg, NULL);
        break;
 
      case 'd':
@@ -230,18 +230,18 @@ static void dbprintf(int prefix, const char * fmt, ...)
        break;
 
      case ':':
-       fprintf(stderr, "gocfg: missing value for -%c\n", optopt);
+       fprintf(stderr, "gocfg: missing value for -%c\n", ulapi_optopt);
        return 1;
        break;
 
      default:			/* '?' */
-       fprintf (stderr, "unrecognized option -%c\n", optopt);
+       fprintf (stderr, "unrecognized option -%c\n", ulapi_optopt);
        return 1;
        break;
      }
    }
-   if (optind < argc) {
-     fprintf(stderr, "gocfg: extra non-option characters: %s\n", argv[optind]);
+   if (ulapi_optind < argc) {
+     fprintf(stderr, "gocfg: extra non-option characters: %s\n", argv[ulapi_optind]);
      return 1;
    }
 

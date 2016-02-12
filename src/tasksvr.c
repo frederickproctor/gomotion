@@ -332,17 +332,17 @@ int main(int argc, char *argv[])
 
   opterr = 0;
   for (;;) {
-    option = getopt(argc, argv, ":i:u:p:d?");
+    option = ulapi_getopt(argc, argv, ":i:u:p:d?");
     if (option == -1)
       break;
 
     switch (option) {
     case 'i':
-      SAFECPY(ini_file, optarg);
+      SAFECPY(ini_file, ulapi_optarg);
       break;
 
     case 'p':
-      opt_port = atoi(optarg);
+      opt_port = atoi(ulapi_optarg);
       break;
 
     case 'd':
@@ -355,18 +355,18 @@ int main(int argc, char *argv[])
       break;
 
     case ':':
-      fprintf(stderr, "tasksvr: missing value for -%c\n", optopt);
+      fprintf(stderr, "tasksvr: missing value for -%c\n", ulapi_optopt);
       return 1;
       break;
 
     default:
-      fprintf(stderr, "tasksvr: unrecognized option -%c\n", optopt);
+      fprintf(stderr, "tasksvr: unrecognized option -%c\n", ulapi_optopt);
       return 1;
       break;
     }
   }
-  if (optind < argc) {
-    fprintf(stderr, "tasksvr: extra non-option characters: %s\n", argv[optind]);
+  if (ulapi_optind < argc) {
+    fprintf(stderr, "tasksvr: extra non-option characters: %s\n", argv[ulapi_optind]);
     return 1;
   }
 

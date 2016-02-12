@@ -4318,13 +4318,13 @@ main(int argc, char *argv[])
 
     opterr = 0;
     while (1) {
-      option = getopt(my_argc, my_argv, ":i:u:dkpx");
+      option = ulapi_getopt(my_argc, my_argv, ":i:u:dkpx");
       if (option == -1)
 	break;
 
       switch (option) {
       case 'i':
-	strncpy(inifile_name, optarg, INIFILE_NAME_LEN);
+	strncpy(inifile_name, ulapi_optarg, INIFILE_NAME_LEN);
 	inifile_name[INIFILE_NAME_LEN - 1] = 0;
 	break;
 
@@ -4345,18 +4345,18 @@ main(int argc, char *argv[])
 	break;
 
       case ':':
-	fprintf(stderr, "gotk: missing value for -%c\n", optopt);
+	fprintf(stderr, "gotk: missing value for -%c\n", ulapi_optopt);
 	return 1;
 	break;
 
       default:			/* '?' */
-	fprintf (stderr, "gotk: unrecognized option -%c\n", optopt);
+	fprintf (stderr, "gotk: unrecognized option -%c\n", ulapi_optopt);
 	return 1;
 	break;
       }
     }
-    if (optind < my_argc) {
-      fprintf(stderr, "gotk: extra non-option characters: %s\n", argv[optind + 1]);
+    if (ulapi_optind < my_argc) {
+      fprintf(stderr, "gotk: extra non-option characters: %s\n", argv[ulapi_optind + 1]);
       return 1;
     }
   }

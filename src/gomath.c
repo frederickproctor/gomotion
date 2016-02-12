@@ -2012,10 +2012,10 @@ go_result go_tridiag_ql(go_real *d,
   Implements Berthold K. P. Horn's solution to the absolute
   orientation problem, which is:
 
-  Given a set of a relatively large set of points, and two sets of
-  measurements of the Cartesian XYZ location of these points with
-  respect to two coordinate systems, what is the least-squares best
-  fit transform from one coordinate system to the other?
+  Given a relatively large set of points, and two sets of measurements
+  of the Cartesian XYZ location of these points with respect to two
+  coordinate systems, what is the least-squares best fit transform
+  from one coordinate system to the other?
 
   See Berthold K. P. Horn, "Close-form solution of absolute
   orientation using unit quaternions," Journal of the Optical Society
