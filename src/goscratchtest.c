@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <math.h>
-#include <go.h>
+#include "go.h"
 
 /*
   Given two points in one coordinate system, transform them into
