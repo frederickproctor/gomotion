@@ -100,7 +100,7 @@ AC_DEFUN([ACX_TCL_LIB],
 	dirs="/usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu")]
     [AC_ARG_WITH(tcllink,
 	    [  --with-tcllink=<link name of Tcl library>  Specify link name of Tcl library],
-	    names=$withval,names="tcl8.5 tcl8.6")]
+	    names=$withval,names="tcl8.6 tcl8.5")]
     for dir in $dirs ; do
 	for name in $names ; do
 		if test -f $dir/lib"$name".a ; then tcllink="-L$dir -l$name"; break; fi
@@ -125,7 +125,7 @@ AC_DEFUN([ACX_TK_LIB],
 	    dirs=$withval,dirs="/usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu")]
     [AC_ARG_WITH(tklink,
 	    [  --with-tklink=<link name of Tk library>  Specify link name of Tk library],
-	    names=$withval,names="tk8.5 tk8.6")]
+	    names=$withval,names="tk8.6 tk8.5")]
     for dir in $dirs ; do
 	for name in $names ; do
 		if test -f $dir/lib"$name".a ; then tklink="-L$dir -l$name"; break; fi
