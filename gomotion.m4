@@ -74,7 +74,7 @@ AC_DEFUN([ACX_TK_INCLUDE],
     [AC_ARG_WITH(tkinclude,
 	[  --with-tkinclude=<path to Tk headers>  Specify path to Tk headers],
 	dirs=$withval,
-	dirs="/usr/include /usr/local/include /usr/include/tk8.5 /usr/include/tk8.4 /usr/include/tk8.3 /usr/include/tcl8.5 /usr/include/tcl8.4 /usr/include/tcl8.3")]
+	dirs="/usr/include/tk")]
     for dir in $dirs ; do
 	if test -f $dir/tk.h ; then tkinclude_dir=$dir ; break; fi
     done
@@ -97,10 +97,10 @@ AC_DEFUN([ACX_TCL_LIB],
     [AC_ARG_WITH(tcllib,
 	[  --with-tcllib=<path to Tcl library>  Specify path to Tcl library],
 	dirs=$withval,
-	dirs="/usr/lib /usr/local/lib")]
+	dirs="/usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu")]
     [AC_ARG_WITH(tcllink,
 	    [  --with-tcllink=<link name of Tcl library>  Specify link name of Tcl library],
-	    names=$withval,names="tcl tcl8.5 tcl85 tcl8.4 tcl84 tcl8.3 tcl83")]
+	    names=$withval,names="tcl8.5 tcl8.6")]
     for dir in $dirs ; do
 	for name in $names ; do
 		if test -f $dir/lib"$name".a ; then tcllink="-L$dir -l$name"; break; fi
@@ -122,10 +122,10 @@ AC_DEFUN([ACX_TK_LIB],
     [AC_MSG_CHECKING([for Tk library])]
     [AC_ARG_WITH(tklib,
 	    [  --with-tklib=<path to Tk library>  Specify path to Tk library],
-	    dirs=$withval,dirs="/usr/lib /usr/local/lib")]
+	    dirs=$withval,dirs="/usr/lib /usr/local/lib /usr/lib/x86_64-linux-gnu")]
     [AC_ARG_WITH(tklink,
 	    [  --with-tklink=<link name of Tk library>  Specify link name of Tk library],
-	    names=$withval,names="tk tk8.5 tk85 tk8.4 tk84 tk8.3 tk83")]
+	    names=$withval,names="tk8.5 tk8.6")]
     for dir in $dirs ; do
 	for name in $names ; do
 		if test -f $dir/lib"$name".a ; then tklink="-L$dir -l$name"; break; fi
