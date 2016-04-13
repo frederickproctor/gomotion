@@ -22,7 +22,10 @@ static enum {USE_UNIX, USE_RTAI} which_ulapi = USE_UNIX;
 
 #define DEFAULT_INI_FILE "gomotion.ini"
 
+#define DEFAULT_GOMAIN "gomain"
+
 static int ini_load(char *inifile_name,
+		    char *gomain,
 		    char ext_init_string[INIFILE_MAX_LINELEN],
 		    int *rtapi_hal_nsecs_per_period,
 		    int *go_stepper_type,
@@ -53,6 +56,17 @@ static int ini_load(char *inifile_name,
   return 1
 
   section = "GOMOTION";
+
+  key = "GOMAIN";
+  inistring = ini_find(fp, key, section);
+  if (NULL == inistring) {
+    /* optional, make it the default */
+    strncpy(gomain, DEFAULT_GOMAIN, INIFILE_MAX_LINELEN);
+    gomain[INIFILE_MAX_LINELEN-1] = 0;
+  } else {
+    strncpy(gomain, inistring, INIFILE_MAX_LINELEN);
+    gomain[INIFILE_MAX_LINELEN-1] = 0;
+  }
 
   key = "EXT_INIT_STRING";
   inistring = ini_find(fp, key, section);
@@ -269,13 +283,14 @@ static void sigquit(int sig)
 
 int main(int argc, char *argv[])
 {
-#define BUFFERLEN 256
+#define BUFFERLEN 1024
   int option;
   int shell_arg = 0;
   int wait_arg = 0;
   int debug_arg = 0;
   const char *ularg = "";
   char inifile_name[INIFILE_MAX_LINELEN] = DEFAULT_INI_FILE;
+  char gomain[INIFILE_MAX_LINELEN] = DEFAULT_GOMAIN;
   char ext_init_string[INIFILE_MAX_LINELEN];
   int rtapi_hal_nsecs_per_period = 0;
   int go_stepper_type = 0;
@@ -362,6 +377,7 @@ int main(int argc, char *argv[])
   ulapi_dirname(argv[0], dirname);
 
   if (0 != ini_load(inifile_name,
+		    gomain,
 		    ext_init_string,
 		    &rtapi_hal_nsecs_per_period,
 		    &go_stepper_type,
@@ -484,7 +500,7 @@ int main(int argc, char *argv[])
   } else {
     result = ulapi_snprintf(path, sizeof(path)-1,
 			    "%s%s%s DEBUG=%d EXT_INIT_STRING=%s SERVO_HOWMANY=%d SERVO_SHM_KEY=%d SERVO_SEM_KEY=%d TRAJ_SHM_KEY=%d KINEMATICS=%s GO_LOG_SHM_KEY=%d GO_IO_SHM_KEY=%d", 
-			    dirname, ulapi_pathsep, "gomain",
+			    dirname, ulapi_pathsep, gomain,
 			    debug_arg ? 1 : 0,
 			    ext_init_string,
 			    (int) servo_howmany,
@@ -502,7 +518,7 @@ int main(int argc, char *argv[])
     if (ULAPI_OK != ulapi_process_start(gomain_proc, path)) {
       ulapi_process_delete(gomain_proc);
       gomain_proc = NULL;
-      fprintf(stderr, "gorun: can't run gomain process\n");
+      fprintf(stderr, "gorun: can't run gomain process %s\n", gomain);
       return 1;
     }
   }
