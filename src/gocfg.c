@@ -374,7 +374,7 @@ static void dbprintf(int prefix, const char * fmt, ...)
        }
      }
      if (! got_it) {
-       fprintf(stderr, "gocfg: timed out connecting to servo\n");
+       fprintf(stderr, "gocfg: timed out connecting to servo %d\n", servo_num);
        RETURN(1);
      }
    }

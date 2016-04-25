@@ -206,7 +206,7 @@ emu_galil_DEPENDENCIES = ../lib/libgo.a
 
 # stuff for Smart Motors
 
-bin_PROGRAMS += gomain_smartmotor emu_smartmotor
+bin_PROGRAMS += gomain_smartmotor emu_smartmotor test_smartmotor
 
 gomain_smartmotor_SOURCES = \
 ../src/extintf.h \
@@ -221,6 +221,10 @@ gomain_smartmotor_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
 emu_smartmotor_SOURCES = ../src/emu_smartmotor.c
 emu_smartmotor_LDADD = ../lib/libgo.a @ULAPI_LIBS@ 
 emu_smartmotor_DEPENDENCIES = ../lib/libgo.a
+
+test_smartmotor_SOURCES = ../src/test_smartmotor.c
+test_smartmotor_LDADD = ../lib/libgo.a @ULAPI_LIBS@ 
+test_smartmotor_DEPENDENCIES = ../lib/libgo.a
 
 if HAVE_EXTINTF
 bin_PROGRAMS += gomain_extintf

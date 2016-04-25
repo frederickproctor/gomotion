@@ -145,7 +145,7 @@ go_result ext_init(char *init_string)
     args->task = NULL;
     args->mutex = NULL;
     args->serial_id = NULL;
-    args->position = 12345.0;
+    args->position = 0;
     args->old_position = args->position;
     args->period_nsec = 100000000;
     args->inverse_cycle_time = 1.0e9 / ((go_real) args->period_nsec);
@@ -167,6 +167,10 @@ go_result ext_init(char *init_string)
 	  /* setting serial_id to NULL flags that this port should be stubbed */
 	}
       }
+
+      ulapi_serial_baud(args->serial_id, 9600);
+      ulapi_serial_set_nonblocking(args->serial_id);
+
       retval = rtapi_task_start(args->task,
 				taskcode,
 				args,
