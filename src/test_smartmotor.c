@@ -1,6 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "ulapi.h"
+
+static char *trim_tail(char *str)
+{
+  char *ptr;
+  
+  if (0 == *str) return str;
+  
+  ptr = str + strlen(str) - 1;
+
+  while (isspace(*ptr) && ptr >= str) *ptr-- = 0;
+
+  return str;
+}
 
 static void task_code(void *serial)
 {
@@ -12,10 +27,11 @@ static void task_code(void *serial)
   for (;;) {
     nchars = ulapi_serial_read(serial, buffer, sizeof(buffer)-1);
     if (nchars < 0) break;
-    else if (nchars == 0) printf("nothing\n");
-    else {
-      for (t = 0; t < nchars; t++) fputc(buffer[t], stdout);
-	  fflush(stdout);
+    if (nchars > 0) {
+      for (t = 0; t < nchars; t++) {
+	fputc(buffer[t], stdout);
+      }
+      fflush(stdout);
     }
   }
 
@@ -67,15 +83,12 @@ int main(int argc, char * argv[])
   ulapi_task_start(task, task_code, serial, ulapi_prio_lowest(), 0);
 
   while (! feof(stdin)) {
-	int retval;
     printf("> ");
     fflush(stdout);
     if (NULL == fgets(buffer, BUFFERLEN, stdin)) break;
-#if 0
-    retval = ulapi_serial_write(serial, buffer, strlen(buffer));
-#else
-    ulapi_serial_write(serial, "RP \r", 4);
-#endif
+    trim_tail(buffer);
+    strcat(buffer, "\r");
+    ulapi_serial_write(serial, buffer, strlen(buffer));
   }
 
   return 0;
