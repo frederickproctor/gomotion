@@ -44,6 +44,7 @@ typedef struct {
   rtapi_integer period_nsec;
   go_real inverse_cycle_time;
   go_flag valid;
+  go_flag debug;
 } smartmotor_struct;
 
 static smartmotor_struct smartmotors[SERVO_NUM];
@@ -55,7 +56,6 @@ void taskcode(void *args)
   void *serial_id;
   go_real *posptr;
   go_real *oldptr;
-  go_real *scaleptr;
   rtapi_integer *perptr;
   go_flag *validptr;
   enum {BUFFERLEN = 256};
@@ -70,7 +70,6 @@ void taskcode(void *args)
   perptr = &(((smartmotor_struct *) args)->period_nsec);
   posptr = &(((smartmotor_struct *) args)->position);
   oldptr = &(((smartmotor_struct *) args)->old_position);
-  scaleptr = &(((smartmotor_struct *) args)->scale_vel);
   validptr = &(((smartmotor_struct *) args)->valid);
 
   if (NULL != serial_id) {
@@ -132,7 +131,6 @@ go_result ext_init(char *init_string)
   rtapi_integer servo_num;
   rtapi_result retval;
   rtapi_integer count_nsec;
-  rtapi_integer len;
 
   if (NULL == init_string) {
     return GO_RESULT_OK;
@@ -143,7 +141,10 @@ go_result ext_init(char *init_string)
     if (*ptr == '"') *ptr = ' ';
   }
 
-  rtapi_print("ext_smartmotor: init string = %s\n", init_string);
+  /* set the bits in this mask to turn on debug printing for the set servo */
+#define DEBUG_FLAGS 0x01
+  
+  if (DEBUG_FLAGS) rtapi_print("ext_smartmotor: init string = %s\n", init_string);
 
   for (servo_num = 0, ptr = rtapi_string_skipwhite(init_string);
        servo_num < SERVO_NUM;
@@ -155,9 +156,12 @@ go_result ext_init(char *init_string)
     args->serial_id = NULL;
     args->position = 0;
     args->old_position = args->position;
+    args->scale_vel = 1;
     args->period_nsec = 100000000;
     args->inverse_cycle_time = 1.0e9 / ((go_real) args->period_nsec);
     args->valid = 0;
+    if ((1 << servo_num) & DEBUG_FLAGS) args->debug = 1;
+    else args->debug = 0;
 
     (void) rtapi_string_copyone(port, ptr);
     if (*port != 0) {
@@ -292,6 +296,11 @@ go_result ext_write_pos(go_integer joint, go_real pos)
   buffer[sizeof(buffer) - 1] = 0;
 #endif
 
+  if (smartmotors[joint].debug) {
+    printf("%f ", (double) vel);
+    rtapi_print("%s\n", buffer);
+  }
+
   if (NULL == smartmotors[joint].serial_id) {
     smartmotors[joint].position = pos;
   } else {
@@ -393,18 +402,23 @@ go_result ext_set_parameters(go_integer joint, go_real * values, go_integer numb
   enum {BUFFERLEN = 256};
   char buffer[BUFFERLEN];
 
+  printf("ext_smartmotor: ext_set_parameters for joint %d\n", joint);
+
   if (joint < 0 || joint >= SERVO_NUM) return GO_RESULT_ERROR;
   if (number < 4) return GO_RESULT_ERROR; /* need at least Scale P I D */
 
   smartmotors[joint].scale_vel = values[0];
 
   if (smartmotors[joint].valid) {
-    rtapi_mutex_take(smartmotors[joint].mutex);
     rtapi_snprintf(buffer, sizeof(buffer) - 1, "KP=%d KD=%d KI=%d G\r",
 		   (int) values[1], (int) values[2], (int) values[3]);
     buffer[sizeof(buffer) - 1] = 0;
-    (void) rtapi_serial_write(smartmotors[joint].serial_id, buffer, strlen(buffer));
-    rtapi_mutex_give(smartmotors[joint].mutex);
+    if (NULL != smartmotors[joint].serial_id) {
+      rtapi_mutex_take(smartmotors[joint].mutex);
+      (void) rtapi_serial_write(smartmotors[joint].serial_id, buffer, strlen(buffer));
+      rtapi_mutex_give(smartmotors[joint].mutex);
+    }
+    if (smartmotors[joint].debug) rtapi_print("%s\n", buffer);
   }
 
   return GO_RESULT_OK;
