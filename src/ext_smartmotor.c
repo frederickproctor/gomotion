@@ -22,17 +22,17 @@
 #include <stdio.h>		/* snprintf */
 #include <string.h>		/* strlen */
 #include <stddef.h>		/* NULL */
-#include <stdlib.h>		/* atoi */
+#include <stdlib.h>		/* atoi, rand */
 #include <rtapi.h>		/* rtapi_string_to_integer */
 #include "gotypes.h"
 #include "extintf.h"
 #include "servointf.h"		/* SERVO_NUM */
 
-#define SEPARATE_RP_QUERY 1
-
 #define DEFAULT_VEL 200000
 #define DEFAULT_ACC  20000
 #define MIN_VEL      20000
+
+#define URAND (((double) rand()) / ((double) RAND_MAX))
 
 typedef struct {
   void *task;
@@ -88,7 +88,6 @@ void taskcode(void *args)
   }
 
   for (;;) {
-#ifdef SEPARATE_RP_QUERY
     if (NULL != serial_id) {
       strcpy(buffer, "RP\r");
       rtapi_mutex_take(mutex);
@@ -103,9 +102,7 @@ void taskcode(void *args)
 	rtapi_mutex_give(mutex);
       }
     }
-#else
-    *validptr = 1;
-#endif
+
     /*
       This update task should not run so fast as to overwhelm the
       external Smart Motor system with RP messages. It should run
@@ -169,7 +166,10 @@ go_result ext_init(char *init_string)
       args->mutex = rtapi_mutex_new(servo_num);
       (void) rtapi_mutex_give(args->mutex);
       /* ports named "-" are stubbed without error */
-      if (strcmp(port, "-")) {
+      if (! strcmp(port, "-")) {
+	/* make it a random start number to test offset handling */
+	args->position = 100000 * (2 * URAND - 1);
+      } else {
 	args->serial_id = rtapi_serial_new();
 	retval = rtapi_serial_open(port, args->serial_id);
 	if (RTAPI_OK != retval) {
@@ -287,7 +287,7 @@ go_result ext_write_pos(go_integer joint, go_real pos)
   */
   vel *= smartmotors[joint].scale_vel;
 
-#define INCLUDE_SPEED 1
+#undef INCLUDE_SPEED
 #ifdef INCLUDE_SPEED
   rtapi_snprintf(buffer, sizeof(buffer) - 1, "V=%d P=%d G\r", (int) vel, (int) pos);
   buffer[sizeof(buffer) - 1] = 0;
@@ -297,7 +297,6 @@ go_result ext_write_pos(go_integer joint, go_real pos)
 #endif
 
   if (smartmotors[joint].debug) {
-    printf("%f ", (double) vel);
     rtapi_print("%s\n", buffer);
   }
 
