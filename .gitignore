@@ -1,4 +1,4 @@
-*.~*~
+*~
 .cvsignore
 Makefile
 Makefile.in
@@ -32,8 +32,10 @@ bin/igpsserver
 bin/inb
 bin/outb
 bin/rs274ngc
+bin/sixdof
 bin/taskmain
 bin/tasksvr
+bin/test_smartmotor
 bin/toolmain
 bin/tracker
 bin/variates

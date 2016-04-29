@@ -374,6 +374,10 @@ int main(int argc, char *argv[])
     return 1;
   } 
 
+  if (debug_arg) {
+    ulapi_set_debug(ULAPI_DEBUG_ALL);
+  }
+
   ulapi_dirname(argv[0], dirname);
 
   if (0 != ini_load(inifile_name,
@@ -491,6 +495,7 @@ int main(int argc, char *argv[])
       fprintf(stderr, "gorun: install go main command too long\n");
       return 1;
     }
+
     result = ulapi_system(path, &sysresult);
     /* ignore sysresult, which can be nonzero if the module exists */
     if (GO_RESULT_OK != result) {
@@ -499,7 +504,7 @@ int main(int argc, char *argv[])
     }
   } else {
     result = ulapi_snprintf(path, sizeof(path)-1,
-			    "%s%s%s DEBUG=%d EXT_INIT_STRING=%s SERVO_HOWMANY=%d SERVO_SHM_KEY=%d SERVO_SEM_KEY=%d TRAJ_SHM_KEY=%d KINEMATICS=%s GO_LOG_SHM_KEY=%d GO_IO_SHM_KEY=%d", 
+			    "%s%s%s DEBUG=%d EXT_INIT_STRING=\"%s\" SERVO_HOWMANY=%d SERVO_SHM_KEY=%d SERVO_SEM_KEY=%d TRAJ_SHM_KEY=%d KINEMATICS=%s GO_LOG_SHM_KEY=%d GO_IO_SHM_KEY=%d", 
 			    dirname, ulapi_pathsep, gomain,
 			    debug_arg ? 1 : 0,
 			    ext_init_string,
@@ -514,6 +519,11 @@ int main(int argc, char *argv[])
       fprintf(stderr, "gorun: gomain command too long\n");
       return 1;
     }
+
+    if (debug_arg) {
+      ulapi_print("gorun: running %s\n", path);
+    }
+
     gomain_proc = ulapi_process_new();
     if (ULAPI_OK != ulapi_process_start(gomain_proc, path)) {
       ulapi_process_delete(gomain_proc);
@@ -577,6 +587,7 @@ int main(int argc, char *argv[])
       fprintf(stderr, "gorun: can't run taskmain process\n");
       return 1;
     }
+    printf("gorun: running taskmain process %s\n", path);
 
     /* only run tasksvr if task is running */
     if (0 != task_tcp_port) {

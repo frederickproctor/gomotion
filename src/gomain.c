@@ -82,30 +82,41 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   int servo_num;
   int servo_prio;
   int traj_prio;
+  int t;
 
   if (0 != rtapi_app_init(RTAPI_APP_ARGS)) {
+    rtapi_print("gomain: can't initialize\n");
     return 1;
   }
 
   /* get command line args */
+
   (void) rtapi_arg_get_int(&DEBUG, "DEBUG");
-  if (DEBUG) rtapi_print("using DEBUG = %d\n", DEBUG);
+  if (DEBUG) rtapi_print("gomain: using DEBUG = %d\n", DEBUG);
+
+  if (DEBUG) {
+    rtapi_print("gomain: %d arguments:\n", rtapi_argc);
+    for (t = 0; t < rtapi_argc; t++) {
+      rtapi_print("gomain:   %s\n", rtapi_argv[t]);
+    }
+  }
+
   (void) rtapi_arg_get_int(&TRAJ_SHM_KEY, "TRAJ_SHM_KEY");
-  if (DEBUG) rtapi_print("using TRAJ_SHM_KEY = %d\n", TRAJ_SHM_KEY);
+  if (DEBUG) rtapi_print("gomain: using TRAJ_SHM_KEY = %d\n", TRAJ_SHM_KEY);
   (void) rtapi_arg_get_int(&SERVO_HOWMANY, "SERVO_HOWMANY");
-  if (DEBUG) rtapi_print("using SERVO_HOWMANY = %d\n", SERVO_HOWMANY);
+  if (DEBUG) rtapi_print("gomain: using SERVO_HOWMANY = %d\n", SERVO_HOWMANY);
   (void) rtapi_arg_get_int(&SERVO_SHM_KEY, "SERVO_SHM_KEY");
-  if (DEBUG) rtapi_print("using SERVO_SHM_KEY = %d\n", SERVO_SHM_KEY);
+  if (DEBUG) rtapi_print("gomain: using SERVO_SHM_KEY = %d\n", SERVO_SHM_KEY);
   (void) rtapi_arg_get_int(&SERVO_SEM_KEY, "SERVO_SEM_KEY");
-  if (DEBUG) rtapi_print("using SERVO_SEM_KEY = %d\n", SERVO_SEM_KEY);
+  if (DEBUG) rtapi_print("gomain: using SERVO_SEM_KEY = %d\n", SERVO_SEM_KEY);
   (void) rtapi_arg_get_string(&EXT_INIT_STRING, "EXT_INIT_STRING");
-  if (DEBUG) rtapi_print("using EXT_INIT_STRING = %s\n", EXT_INIT_STRING);
+  if (DEBUG) rtapi_print("gomain: using EXT_INIT_STRING = %s\n", EXT_INIT_STRING);
   (void) rtapi_arg_get_string(&KINEMATICS, "KINEMATICS");
-  if (DEBUG) rtapi_print("using KINEMATICS = %s\n", KINEMATICS);
+  if (DEBUG) rtapi_print("gomain: using KINEMATICS = %s\n", KINEMATICS);
   (void) rtapi_arg_get_int(&GO_LOG_SHM_KEY, "GO_LOG_SHM_KEY");
-  if (DEBUG) rtapi_print("using GO_LOG_SHM_KEY = %d\n", GO_LOG_SHM_KEY);
+  if (DEBUG) rtapi_print("gomain: using GO_LOG_SHM_KEY = %d\n", GO_LOG_SHM_KEY);
   (void) rtapi_arg_get_int(&GO_IO_SHM_KEY, "GO_IO_SHM_KEY");
-  if (DEBUG) rtapi_print("using GO_IO_SHM_KEY = %d\n", GO_IO_SHM_KEY);
+  if (DEBUG) rtapi_print("gomain: using GO_IO_SHM_KEY = %d\n", GO_IO_SHM_KEY);
 
   /* need at least the first servo task to clock the semaphore */
   if (SERVO_HOWMANY < 1) SERVO_HOWMANY = 1;

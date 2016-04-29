@@ -128,14 +128,22 @@ go_result ext_init(char *init_string)
 {
   char port[EXT_INIT_STRING_LENGTH];
   smartmotor_struct *args;
-  const char *ptr;
+  char *ptr, *end;
   rtapi_integer servo_num;
   rtapi_result retval;
   rtapi_integer count_nsec;
+  rtapi_integer len;
 
   if (NULL == init_string) {
     return GO_RESULT_OK;
   }
+
+  /* our init string probably has quotes, so make them spaces */
+  for (ptr = init_string, end = ptr + strlen(ptr); ptr < end; ptr++) {
+    if (*ptr == '"') *ptr = ' ';
+  }
+
+  rtapi_print("ext_smartmotor: init string = %s\n", init_string);
 
   for (servo_num = 0, ptr = rtapi_string_skipwhite(init_string);
        servo_num < SERVO_NUM;
@@ -166,10 +174,9 @@ go_result ext_init(char *init_string)
 	  args->serial_id = NULL;
 	  /* setting serial_id to NULL flags that this port should be stubbed */
 	}
+	rtapi_serial_baud(args->serial_id, 9600);
+	rtapi_serial_set_nonblocking(args->serial_id);
       }
-
-      ulapi_serial_baud(args->serial_id, 9600);
-      ulapi_serial_set_nonblocking(args->serial_id);
 
       retval = rtapi_task_start(args->task,
 				taskcode,
