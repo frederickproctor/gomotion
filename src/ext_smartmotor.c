@@ -23,10 +23,13 @@
 #include <string.h>		/* strlen */
 #include <stddef.h>		/* NULL */
 #include <stdlib.h>		/* atoi, rand */
-#include <rtapi.h>		/* rtapi_string_to_integer */
+#include <rtapi.h>		/* rtapi_serial_write */
 #include "gotypes.h"
 #include "extintf.h"
 #include "servointf.h"		/* SERVO_NUM */
+
+/* FIXME - testing, ulapi calls shouldn't really be in here */
+extern double ulapi_time(void);
 
 #define DEFAULT_VEL  200000
 #define DEFAULT_ACC 2000000
@@ -297,7 +300,7 @@ go_result ext_write_pos(go_integer joint, go_real pos)
 #endif
 
   if (smartmotors[joint].debug) {
-    rtapi_print("%s\n", buffer);
+    rtapi_print("[%f]\t%s\n", (double) ulapi_time(), buffer);
   }
 
   if (NULL == smartmotors[joint].serial_id) {
