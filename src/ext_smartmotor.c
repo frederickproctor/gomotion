@@ -28,9 +28,9 @@
 #include "extintf.h"
 #include "servointf.h"		/* SERVO_NUM */
 
-#define DEFAULT_VEL 200000
-#define DEFAULT_ACC  20000
-#define MIN_VEL      20000
+#define DEFAULT_VEL  200000
+#define DEFAULT_ACC 2000000
+#define MIN_VEL       10000
 
 #define URAND (((double) rand()) / ((double) RAND_MAX))
 
@@ -153,7 +153,7 @@ go_result ext_init(char *init_string)
     args->serial_id = NULL;
     args->position = 0;
     args->old_position = args->position;
-    args->scale_vel = 1;
+    args->scale_vel = 20;
     args->period_nsec = 100000000;
     args->inverse_cycle_time = 1.0e9 / ((go_real) args->period_nsec);
     args->valid = 0;
@@ -287,7 +287,7 @@ go_result ext_write_pos(go_integer joint, go_real pos)
   */
   vel *= smartmotors[joint].scale_vel;
 
-#undef INCLUDE_SPEED
+#define INCLUDE_SPEED 1
 #ifdef INCLUDE_SPEED
   rtapi_snprintf(buffer, sizeof(buffer) - 1, "V=%d P=%d G\r", (int) vel, (int) pos);
   buffer[sizeof(buffer) - 1] = 0;
