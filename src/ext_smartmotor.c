@@ -142,7 +142,7 @@ go_result ext_init(char *init_string)
   }
 
   /* set the bits in this mask to turn on debug printing for the set servo */
-#define DEBUG_FLAGS 0x01
+#define DEBUG_FLAGS 0x02
   
   if (DEBUG_FLAGS) rtapi_print("ext_smartmotor: init string = %s\n", init_string);
 
@@ -300,7 +300,7 @@ go_result ext_write_pos(go_integer joint, go_real pos)
 #endif
 
   if (smartmotors[joint].debug) {
-    rtapi_print("[%f]\t%s\n", (double) ulapi_time(), buffer);
+    rtapi_print("%d\t%s\n", joint+1, (double) ulapi_time(), buffer);
   }
 
   if (NULL == smartmotors[joint].serial_id) {
