@@ -9,10 +9,25 @@
 #include <float.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdarg.h>
 #include "canon.h"
 #include "rs274ngc.h"		// rs274ngc_sequence_number()
 #include "taskintf.h"		// task_interplist
 #include "interplist.h"
+
+static bool dbflag = false;
+
+static void dbprintf(const char * fmt, ...)
+{
+  va_list ap;
+
+  if (dbflag) {
+    va_start(ap, fmt);
+    vprintf(fmt, ap);
+    fflush(stdout);
+    va_end(ap);
+  }
+}
 
 /*
   The global interp list, written by the Go Motion canonical interface
@@ -152,7 +167,7 @@ void SET_ORIGIN_OFFSETS(
 void USE_LENGTH_UNITS(CANON_UNITS in_unit)
 {
   if (in_unit == CANON_UNITS_INCHES) {
-    printf("USE_LENGTH_UNITS(CANON_UNITS_INCHES)\n");
+    dbprintf("USE_LENGTH_UNITS(CANON_UNITS_INCHES)\n");
     if (_length_unit_type == CANON_UNITS_MM) {
       interp_per_go_length /= 25.4;
       go_per_interp_length *= 25.4;
@@ -165,7 +180,7 @@ void USE_LENGTH_UNITS(CANON_UNITS in_unit)
       _program_position_z SET_TO (_program_position_z / 25.4);
     }
   } else if (in_unit == CANON_UNITS_MM) {
-    printf("USE_LENGTH_UNITS(CANON_UNITS_MM)\n");
+    dbprintf("USE_LENGTH_UNITS(CANON_UNITS_MM)\n");
     if (_length_unit_type == CANON_UNITS_INCHES) {
       interp_per_go_length *= 25.4;
       go_per_interp_length /= 25.4;
@@ -301,7 +316,7 @@ void STRAIGHT_TRAVERSE
   _program_position_c SET_TO c; /*CC*/
 #endif
 
-  printf("STRAIGHT_TRAVERSE(%.4f, %.4f, %.4f"
+  dbprintf("STRAIGHT_TRAVERSE(%.4f, %.4f, %.4f"
 #ifdef AA
          ", %.4f" /*AA*/
 #endif
@@ -340,7 +355,7 @@ void SET_FEED_RATE(double rate)
 
 void SET_FEED_REFERENCE(CANON_FEED_REFERENCE reference)
 {
-  printf("SET_FEED_REFERENCE(%s)\n", reference == CANON_WORKPIECE ? "CANON_WORKPIECE" : "CANON_XYZ");
+  dbprintf("SET_FEED_REFERENCE(%s)\n", reference == CANON_WORKPIECE ? "CANON_WORKPIECE" : "CANON_XYZ");
 }
 
 void SET_MOTION_CONTROL_MODE(CANON_MOTION_MODE mode)
@@ -587,7 +602,7 @@ void ARC_FEED
   _program_position_c SET_TO c; /*CC*/
 #endif
 
-  printf("ARC_FEED(%.4f, %.4f, %.4f"
+  dbprintf("ARC_FEED(%.4f, %.4f, %.4f"
 #ifdef AA
          ", %.4f" /*AA*/
 #endif
@@ -736,7 +751,7 @@ void STRAIGHT_FEED
   _program_position_c SET_TO c; /*CC*/
 #endif
 
-  printf("STRAIGHT_FEED(%.4f, %.4f, %.4f"
+  dbprintf("STRAIGHT_FEED(%.4f, %.4f, %.4f"
 #ifdef AA
          ", %.4f" /*AA*/
 #endif
@@ -913,7 +928,7 @@ void STRAIGHT_PROBE
   _probe_position_c SET_TO c; /*CC*/
 #endif
 
-  printf("STRAIGHT_PROBE(%.4f, %.4f, %.4f"
+  dbprintf("STRAIGHT_PROBE(%.4f, %.4f, %.4f"
 #ifdef AA
          ", %.4f" /*AA*/
 #endif
@@ -1040,13 +1055,13 @@ void CHANGE_TOOL(int slot)
   val.type = TASK_EXEC_WAIT_FOR_TOOL_TYPE;
   interplist_put(&task_interplist, val);
 
-  printf("CHANGE_TOOL(%d)", (int) slot);
+  dbprintf("CHANGE_TOOL(%d)", (int) slot);
   if (slot < 0 || slot >= sizeof(_tools)/sizeof(*_tools)) {
-    printf(" (out of range)\n");
+    dbprintf(" (out of range)\n");
     return;
   }
   tool = GET_EXTERNAL_TOOL_TABLE(slot);
-  printf(" [%d] [%.4f] [%.4f]\n", tool.id, tool.length, tool.diameter);
+  dbprintf(" [%d] [%.4f] [%.4f]\n", tool.id, tool.length, tool.diameter);
 
   _active_slot SET_TO slot;
 }
@@ -1065,6 +1080,16 @@ void CLAMP_AXIS(CANON_AXIS axis)
 
 void COMMENT(const char *s)
 {
+  /* Rogue extensibility via hot comments - comments that do something */
+#define HOT(STR) (!strncmp(s, STR, strlen(STR)))
+
+  if (HOT("DEBUGON")) {
+    dbflag = true;
+  } else if (HOT("DEBUGOFF")) {
+    dbflag = false;
+  }
+
+  dbprintf("COMMENT(%s)\n", s);
 }
 
 void DISABLE_FEED_OVERRIDE()

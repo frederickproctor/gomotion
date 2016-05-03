@@ -142,7 +142,7 @@ go_result ext_init(char *init_string)
   }
 
   /* set the bits in this mask to turn on debug printing for the set servo */
-#define DEBUG_FLAGS 0x02
+#define DEBUG_FLAGS 0x0
   
   if (DEBUG_FLAGS) rtapi_print("ext_smartmotor: init string = %s\n", init_string);
 

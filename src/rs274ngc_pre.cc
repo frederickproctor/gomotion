@@ -310,7 +310,7 @@ static const char * _rs274ngc_errors[] = {
 /* 197 */ "Zero radius arc", // arc_data_ijk
 "The End"};
 
-#define DEBUG_EMC
+#undef DEBUG_EMC
 
 /*
 

@@ -1,11 +1,20 @@
 %
+(DEBUGOFF)
+(This is the raster program)
+(DEBUGON)
 G54 (use work offset 1)
 G21 (mm units)
 G0 X0 Y0 Z0
 G1 X-200 Y-200 Z200 F6000
+T1 M6
+S1000 M3
+M7
 X200
+M9
 Y-180
+M7
 X-200
+M5 M9
 Y-160
 X200
 Y-140
