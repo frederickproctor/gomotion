@@ -1,20 +1,26 @@
-# INCLUDES = -I. -I@ULAPI_DIR@/include
 AM_CPPFLAGS = -I. -I@ULAPI_DIR@/include
 
+if HAVE_TCL_INCLUDE
+AM_CPPFLAGS += -I@TCL_INCLUDE_DIR@
+endif
+
 if HAVE_TK_INCLUDE
-# INCLUDES += -I@TK_INCLUDE_DIR@
 AM_CPPFLAGS += -I@TK_INCLUDE_DIR@
 endif
+
 if HAVE_SDL
-# INCLUDES += @SDL_CFLAGS@
 AM_CPPFLAGS += @SDL_CFLAGS@
 endif
 
 EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup
 
 bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc
+
+if HAVE_TCL_LIB
+bin_PROGRAMS += gotcl
+endif
 if HAVE_TK_LIB
-bin_PROGRAMS += gotk gotcl
+bin_PROGRAMS += gotk
 endif
 
 bin_PROGRAMS += gorun
@@ -128,6 +134,16 @@ variates_CFLAGS = -DMAIN
 rs274ngc_SOURCES = ../src/rs274ngc_pre.cc ../src/rs274ngc.h ../src/rs274ngc_return.h ../src/canon_pre.cc ../src/canon.h ../src/rs274ngc_driver.cc
 rs274ngc_CFLAGS = -DAA -DBB -DCC
 
+if HAVE_TCL_INCLUDE
+if HAVE_TCL_LIB
+
+# gotcl is the Tcl-enabled script interface that doesn't require X Windows
+# or a DISPLAY environment variable
+gotcl_SOURCES = ../src/gotk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotcl_CFLAGS = -DBUILD_GOTCL
+gotcl_LDADD = ../lib/libgo.a @TCL_LINK@ @ULAPI_LIBS@ 
+gotcl_DEPENDENCIES = ../lib/libgo.a
+
 if HAVE_TK_INCLUDE
 if HAVE_TK_LIB
 
@@ -141,12 +157,8 @@ gotk_LDADD += @SDL_LIBS@
 endif
 gotk_DEPENDENCIES = ../lib/libgo.a
 
-# gotcl is the Tcl-enabled script interface that doesn't require X Windows
-# or a DISPLAY environment variable
-gotcl_SOURCES = ../src/gotk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
-gotcl_CFLAGS = -DBUILD_GOTCL
-gotcl_LDADD = ../lib/libgo.a @TCL_LINK@ @TCL_LINK@ @ULAPI_LIBS@ 
-gotcl_DEPENDENCIES = ../lib/libgo.a
+endif
+endif
 
 endif
 endif
