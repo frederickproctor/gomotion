@@ -1,7 +1,7 @@
 #!/bin/sh
 # run as "scripts/godseye.tcl -i etc/genhexh.ini -u rtai"
 # the next line restarts using gotcl \
-exec /usr/local/proj/gomotion/bin/gotcl "$0" -- "$@"
+exec /usr/local/bin/gotcl "$0" -- "$@"
 
 # set a convenient alias
 interp alias {} move {} gotk_traj_move_world

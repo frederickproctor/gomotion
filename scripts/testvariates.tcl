@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using gotcl \
-exec /usr/local/proj/gomotion/bin/gotcl "$0" -- "$@"
+exec /usr/local/bin/gotcl "$0" -- "$@"
 
 if {false} {
     set r [weibull init 3 1]

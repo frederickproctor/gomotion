@@ -1,3 +1,7 @@
+1.30	5 January 2017
+	Refactored gotcl.c, gotk.c to avoid building two objects with the
+	same name.
+
 1.29	8 January 2016
 	Added Fanuc LR Mate 200iD kinematics; change getopt to
 	ulapi_getopt; updated Smart Motor interface

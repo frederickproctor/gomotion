@@ -1,6 +1,6 @@
 #!/bin/sh
 # the next line restarts using gotk \
-exec /usr/local/proj/gomotion/bin/gotcl "$0" -- "$@"
+exec /usr/local/bin/gotcl "$0" -- "$@"
 
 set inifile [gotk_inifile]
 set homestr [gotk_ini HOME TRAJ $inifile]

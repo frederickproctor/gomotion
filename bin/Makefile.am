@@ -139,9 +139,11 @@ if HAVE_TCL_LIB
 
 # gotcl is the Tcl-enabled script interface that doesn't require X Windows
 # or a DISPLAY environment variable
-gotcl_SOURCES = ../src/gotk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
-gotcl_CFLAGS = -DBUILD_GOTCL
+gotcl_SOURCES = ../src/gotcl.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
 gotcl_LDADD = ../lib/libgo.a @TCL_LINK@ @ULAPI_LIBS@ 
+if HAVE_SDL
+gotcl_LDADD += @SDL_LIBS@
+endif
 gotcl_DEPENDENCIES = ../lib/libgo.a
 
 if HAVE_TK_INCLUDE
@@ -149,7 +151,7 @@ if HAVE_TK_LIB
 
 # gotk is the Tk-enabled script interface that requires X Windows
 # and a DISPLAY environment variable
-gotk_SOURCES = ../src/gotk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotk_SOURCES = ../src/gotk.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
 gotk_CFLAGS = @X_CFLAGS@
 gotk_LDADD = ../lib/libgo.a @TCL_LINK@ @TK_LINK@ @X_PRE_LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @ULAPI_LIBS@ 
 if HAVE_SDL
