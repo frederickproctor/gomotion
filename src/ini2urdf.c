@@ -13,6 +13,13 @@
 #include <ulapi.h>		/* ulapi_time */
 #include "go.h"	
 
+typedef struct {
+  go_pose pose;
+  go_real min_limit;
+  go_real max_limit;
+  go_real max_vel;
+} link_pose_struct;
+
 /*
   Options:
 
@@ -31,11 +38,12 @@ int main(int argc, char *argv[])
   char *section = "";
   char *key = "";
   const char *ini_string = "";
+  char name[BUFFERLEN] = "";
   char servo_name[BUFFERLEN] = "";
   go_real m_per_length_units, rad_per_angle_units;
   int servo_num = 0;
   go_link *link_params = NULL;
-  go_pose *link_poses = NULL;
+  link_pose_struct *link_poses = NULL;
   int saw_link_params = 0;
   int quantity;
   go_dh dh;
@@ -134,8 +142,17 @@ int main(int argc, char *argv[])
 
   section = "GOMOTION";
 
-  key = "LENGTH_UNITS_PER_M";
+  key = "NAME";
+  ini_string = ini_find(inifp, key, section);
+  if (NULL == ini_string) {
+    fprintf(stderr, "not found: [%s] %s\n", section, key);
+    return 1;
+  } else {
+    strncpy(name, ini_string, sizeof(name)-1);
+    name[sizeof(name)-1] = 0;
+  }
 
+  key = "LENGTH_UNITS_PER_M";
   m_per_length_units = 1.0;
   ini_string = ini_find(inifp, key, section);
   if (NULL == ini_string) {
@@ -151,7 +168,6 @@ int main(int argc, char *argv[])
   }
 
   key = "ANGLE_UNITS_PER_RAD";
-
   rad_per_angle_units = 1.0;
   ini_string = ini_find(inifp, key, section);
   if (NULL == ini_string) {
@@ -178,7 +194,6 @@ int main(int argc, char *argv[])
     link_poses = realloc(link_poses, (t+1)*sizeof(*link_poses));
 
     key = "QUANTITY";
-
     ini_string = ini_find(inifp, key, section);
     if (NULL == ini_string) {
       fprintf(stderr, "not found: [%s] %s\n", section, key);
@@ -207,7 +222,7 @@ int main(int argc, char *argv[])
 	  dh.theta = TGA(d4);
 	  link_params[t].u.dh = dh;
 	  link_params[t].type = GO_LINK_DH;
-	  go_dh_pose_convert(&link_params[t].u.dh, &link_poses[t]);
+	  go_dh_pose_convert(&link_params[t].u.dh, &link_poses[t].pose);
 	} else {
 	  fprintf(stderr, "bad entry: [%s] %s = %s\n", section, key, ini_string);
 	  return 1;
@@ -232,12 +247,54 @@ int main(int argc, char *argv[])
 	  go_rpy_quat_convert(&rpy, &pp.pose.rot);
 	  link_params[t].u.pp = pp;
 	  link_params[t].type = GO_LINK_PP;
-	  link_poses[t] = link_params[t].u.pp.pose;
+	  link_poses[t].pose = link_params[t].u.pp.pose;
 	} else {
 	  fprintf(stderr, "bad entry: [%s] %s = %s\n", section, key, ini_string);
 	  return 1;
 	}
 	saw_link_params = 1;
+      }
+    }
+
+    key = "MIN_LIMIT";
+    d1 = 0;
+    ini_string = ini_find(inifp, key, section);
+    if (NULL == ini_string) {
+      fprintf(stderr, "not found: [%s] %s, using default %f\n", section, key, d1);
+    } else {
+      if (1 == sscanf(ini_string, "%lf", &d1)) {
+	link_poses[t].min_limit = TGQ(d1);
+      } else {
+	fprintf(stderr, "bad entry: [%s] %s = %s\n", section, key, ini_string);
+	return 1;
+      }
+    }
+
+    key = "MAX_LIMIT";
+    d1 = 0;
+    ini_string = ini_find(inifp, key, section);
+    if (NULL == ini_string) {
+      fprintf(stderr, "not found: [%s] %s, using default %f\n", section, key, d1);
+    } else {
+      if (1 == sscanf(ini_string, "%lf", &d1)) {
+	link_poses[t].max_limit = TGQ(d1);
+      } else {
+	fprintf(stderr, "bad entry: [%s] %s = %s\n", section, key, ini_string);
+	return 1;
+      }
+    }
+
+    key = "MAX_VEL";
+    d1 = 1;
+    ini_string = ini_find(inifp, key, section);
+    if (NULL == ini_string) {
+      fprintf(stderr, "not found: [%s] %s, using default %f\n", section, key, d1);
+    } else {
+      if (1 == sscanf(ini_string, "%lf", &d1)) {
+	link_poses[t].max_vel = TGQ(d1);
+      } else {
+	fprintf(stderr, "bad entry: [%s] %s = %s\n", section, key, ini_string);
+	return 1;
       }
     }
 
@@ -250,21 +307,25 @@ int main(int argc, char *argv[])
     saw_link_params = 0;
   } /* for (servos) */
 
+  fprintf(urdfp, "<?xml version=\"1.0\"?>\n");
+  fprintf(urdfp, "<robot name=\"%s\">\n", name);
   fprintf(urdfp, "<link name=\"link_0\">\n</link>\n");
   for (t = 0; t < servo_num; t++) {
     fprintf(urdfp, "<link name=\"link_%d\">\n</link>\n", t+1);
 
     fprintf(urdfp, "<joint name=\"joint_%d\" type=\"%s\">\n", t+1, link_params[t].quantity == GO_QUANTITY_LENGTH ? "prismatic" : link_params[t].quantity == GO_QUANTITY_ANGLE ? "revolute" : "floating");
 
-    go_quat_rpy_convert(&link_poses[t].rot, &rpy);
-    fprintf(urdfp, "\t<origin xyz=\"%f %f %f\" rpy=\"%f %f %f\"/>\n", 
-	   link_poses[t].tran.x, link_poses[t].tran.y, link_poses[t].tran.z,
+    go_quat_rpy_convert(&link_poses[t].pose.rot, &rpy);
+    fprintf(urdfp, "\t<origin xyz=\"%f %f %f\" rpy=\"%f %f %f\"/>\n", link_poses[t].pose.tran.x, link_poses[t].pose.tran.y, link_poses[t].pose.tran.z,
 	   rpy.r, rpy.p, rpy.y);
-    fprintf(urdfp, "\t<parent link=\"link_%d\">\n", t);
-    fprintf(urdfp, "\t<child link=\"link_%d\">\n", t+1);
+    fprintf(urdfp, "\t<parent link=\"link_%d\"/>\n", t);
+    fprintf(urdfp, "\t<child link=\"link_%d\"/>\n", t+1);
+    fprintf(urdfp, "\t<axis=\"0 0 1\"/>\n");
+    fprintf(urdfp, "\t<limit lower=\"%f\" upper=\"%f\" effort=\"%f\" velocity=\"%f\"/>\n", link_poses[t].min_limit, link_poses[t].max_limit, 1.0, link_poses[t].max_vel);
     
     fprintf(urdfp, "</joint>\n");
   }
+  fprintf(urdfp, "</robot>\n");
 
   return 0;
 }
