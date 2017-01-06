@@ -226,7 +226,7 @@ proc add_sep {p w} {
 
 set d [frame .display -borderwidth 2 -relief ridge]
 pack $d -side top
-foreach row {1 2 3} {
+foreach row {1 2 3 4} {
     frame $d.row$row
     set number$row [label $d.row$row.posl -textvariable pos$row -width 10 -anchor e -font {Helvetica 12 bold}]
     label $d.row$row.namel -textvariable name$row -width 2 -relief ridge -justify center
