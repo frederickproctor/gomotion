@@ -250,20 +250,20 @@ int main(int argc, char *argv[])
     saw_link_params = 0;
   } /* for (servos) */
 
-  printf("<link name=\"link_0\">\n</link>\n");
+  fprintf(urdfp, "<link name=\"link_0\">\n</link>\n");
   for (t = 0; t < servo_num; t++) {
-    printf("<link name=\"link_%d\">\n</link>\n", t+1);
+    fprintf(urdfp, "<link name=\"link_%d\">\n</link>\n", t+1);
 
-    printf("<joint name=\"joint_%d\" type=\"%s\">\n", t+1, link_params[t].quantity == GO_QUANTITY_LENGTH ? "prismatic" : link_params[t].quantity == GO_QUANTITY_ANGLE ? "revolute" : "floating");
+    fprintf(urdfp, "<joint name=\"joint_%d\" type=\"%s\">\n", t+1, link_params[t].quantity == GO_QUANTITY_LENGTH ? "prismatic" : link_params[t].quantity == GO_QUANTITY_ANGLE ? "revolute" : "floating");
 
     go_quat_rpy_convert(&link_poses[t].rot, &rpy);
-    printf("\t<origin xyz=\"%f %f %f\" rpy=\"%f %f %f\"/>\n", 
+    fprintf(urdfp, "\t<origin xyz=\"%f %f %f\" rpy=\"%f %f %f\"/>\n", 
 	   link_poses[t].tran.x, link_poses[t].tran.y, link_poses[t].tran.z,
 	   rpy.r, rpy.p, rpy.y);
-    printf("\t<parent link=\"link_%d\">\n", t);
-    printf("\t<child link=\"link_%d\">\n", t+1);
+    fprintf(urdfp, "\t<parent link=\"link_%d\">\n", t);
+    fprintf(urdfp, "\t<child link=\"link_%d\">\n", t+1);
     
-    printf("</joint>\n");
+    fprintf(urdfp, "</joint>\n");
   }
 
   return 0;
