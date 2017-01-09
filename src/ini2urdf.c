@@ -307,7 +307,6 @@ int main(int argc, char *argv[])
     saw_link_params = 0;
   } /* for (servos) */
 
-  fprintf(urdfp, "<?xml version=\"1.0\"?>\n");
   fprintf(urdfp, "<robot name=\"%s\">\n", name);
   fprintf(urdfp, "<link name=\"link_0\">\n</link>\n");
   for (t = 0; t < servo_num; t++) {
@@ -320,7 +319,7 @@ int main(int argc, char *argv[])
 	   rpy.r, rpy.p, rpy.y);
     fprintf(urdfp, "\t<parent link=\"link_%d\"/>\n", t);
     fprintf(urdfp, "\t<child link=\"link_%d\"/>\n", t+1);
-    fprintf(urdfp, "\t<axis=\"0 0 1\"/>\n");
+    fprintf(urdfp, "\t<axis xyz=\"0 0 1\"/>\n");
     fprintf(urdfp, "\t<limit lower=\"%f\" upper=\"%f\" effort=\"%f\" velocity=\"%f\"/>\n", link_poses[t].min_limit, link_poses[t].max_limit, 1.0, link_poses[t].max_vel);
     
     fprintf(urdfp, "</joint>\n");
