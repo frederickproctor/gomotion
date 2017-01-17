@@ -308,16 +308,29 @@ int main(int argc, char *argv[])
   } /* for (servos) */
 
   fprintf(urdfp, "<robot name=\"%s\">\n", name);
-  fprintf(urdfp, "<link name=\"link_0\">\n</link>\n");
+  fprintf(urdfp, "<link name=\"base_link\">\n</link>\n");
   for (t = 0; t < servo_num; t++) {
-    fprintf(urdfp, "<link name=\"link_%d\">\n</link>\n", t+1);
+    fprintf(urdfp, "<link name=\"link_%d\">\n", t+1);
+    fprintf(urdfp, "\t<visual>\n");
+    go_quat_rpy_convert(&link_poses[t].pose.rot, &rpy);
+    fprintf(urdfp, "\t<origin xyz=\"%f %f %f\" rpy=\"%f %f %f\"/>\n", link_poses[t].pose.tran.x, link_poses[t].pose.tran.y, link_poses[t].pose.tran.z,
+	   rpy.r, rpy.p, rpy.y);
+    fprintf(urdfp, "\t\t<geometry>\n");
+    fprintf(urdfp, "\t\t\t<cylinder length=\"1\" radius=\"0.1\"/>\n");
+    fprintf(urdfp, "\t\t</geometry>\n");
+    fprintf(urdfp, "\t</visual>\n");
+    fprintf(urdfp, "</link>\n");
 
     fprintf(urdfp, "<joint name=\"joint_%d\" type=\"%s\">\n", t+1, link_params[t].quantity == GO_QUANTITY_LENGTH ? "prismatic" : link_params[t].quantity == GO_QUANTITY_ANGLE ? "revolute" : "floating");
 
     go_quat_rpy_convert(&link_poses[t].pose.rot, &rpy);
     fprintf(urdfp, "\t<origin xyz=\"%f %f %f\" rpy=\"%f %f %f\"/>\n", link_poses[t].pose.tran.x, link_poses[t].pose.tran.y, link_poses[t].pose.tran.z,
 	   rpy.r, rpy.p, rpy.y);
-    fprintf(urdfp, "\t<parent link=\"link_%d\"/>\n", t);
+    if (t == 0) {
+      fprintf(urdfp, "\t<parent link=\"base_link\"/>\n");
+    } else {
+      fprintf(urdfp, "\t<parent link=\"link_%d\"/>\n", t);
+    }
     fprintf(urdfp, "\t<child link=\"link_%d\"/>\n", t+1);
     fprintf(urdfp, "\t<axis xyz=\"0 0 1\"/>\n");
     fprintf(urdfp, "\t<limit lower=\"%f\" upper=\"%f\" effort=\"%f\" velocity=\"%f\"/>\n", link_poses[t].min_limit, link_poses[t].max_limit, 1.0, link_poses[t].max_vel);
