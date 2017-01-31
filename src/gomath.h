@@ -1056,6 +1056,16 @@ typedef struct {
   go_pose pose;		/*!< the pose of the link wrt to the previous link */
 } go_pp;
 
+/*!
+  URDF parameters represent the pose of the link with respect to the
+  previous link. Revolute joints rotate about the axis specified, prismatic
+  joints slide along the axis specified.
+ */
+typedef struct {
+  go_pose pose;		/*!< the pose of the link wrt to the previous link */
+  go_cart axis;		/*!< the axis of rotation or translation */
+} go_urdf;
+
 /*! Rigid body */
 typedef struct {
   go_real mass;			/*!< total mass of the rigid body */
@@ -1094,13 +1104,15 @@ typedef struct {
 enum {
   GO_LINK_DH = 1,		/*!< for Denavit-Hartenberg params  */
   GO_LINK_PK,			/*!< for parallel kinematics  */
-  GO_LINK_PP			/*!< for serial kinematics */
+  GO_LINK_PP,			/*!< for serial kinematics */
+  GO_LINK_URDF			/*!< Unified Robot Description Language */
 };
 
 #define go_link_to_string(L)		\
 (L) == GO_LINK_DH ? "DH" :		\
 (L) == GO_LINK_PK ? "PK" :		\
-(L) == GO_LINK_PP ? "PP" : "None"
+(L) == GO_LINK_PP ? "PP" :		\
+(L) == GO_LINK_URDF ? "URDF" : "None"
 
 /*!
   This is the generic link structure for PKM sliding/cable links and 
@@ -1111,6 +1123,7 @@ typedef struct {
     go_dh dh; /*!< if you have DH params and don't want to convert to PP */
     go_pk pk; /*!< if you have a parallel machine, e.g., hexapod or robot crane */
     go_pp pp; /*!< if you have a serial machine, e.g., an industrial robot  */
+    go_urdf urdf; /*!< if you have URDF parameters for a serial robot  */
   } u;
   go_body body;		       /*!< the link's rigid body parameters */
   go_flag type;		       /*!< one of GO_LINK_DH,PK,PP  */

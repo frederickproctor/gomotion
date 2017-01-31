@@ -38,6 +38,18 @@ void go_mat_print(const go_mat *m)
   return;
 }
 
+void go_matrix_print(const go_matrix *m)
+{
+  go_integer row, col;
+
+  for (row = 0; row < m->rows; row++) {
+    for (col = 0; col < m->cols; col++) {
+      printf("%f ", m->el[row][col]);
+    }
+    printf("\n");
+  }
+}
+
 void go_rvec_print(const go_rvec *rvec)
 {
   printf("%f %f %f\n", (double) rvec->x, (double) rvec->y, (double) rvec->z);
