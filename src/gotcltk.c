@@ -1270,6 +1270,23 @@ gotk_joint_active(ClientData clientData, Tcl_Interp * interp, int objc, Tcl_Obj 
 }
 
 static int
+gotk_joint_number(ClientData clientData, Tcl_Interp * interp, int objc, Tcl_Obj * CONST objv[])
+{
+  int joint;
+  Tcl_Obj * resultPtr;
+
+  if (objc != 1) {
+    Tcl_WrongNumArgs(interp, 1, objv, NULL);
+    return TCL_ERROR;
+  }
+
+  resultPtr = Tcl_GetObjResult(interp);
+  Tcl_SetIntObj(resultPtr, (int) traj_set_ptr->joint_num);
+
+  return TCL_OK;
+}
+
+static int
 gotk_world_pos(ClientData clientData, Tcl_Interp * interp, int objc, Tcl_Obj * CONST objv[])
 {
   char * string;
@@ -4105,6 +4122,7 @@ void gotk_create_commands(Tcl_Interp * interp)
   Tcl_CreateObjCommand(interp, "gotk_joint_cmd_pos", gotk_joint_cmd_pos, NULL, NULL);
   Tcl_CreateObjCommand(interp, "gotk_joint_homed", gotk_joint_homed, NULL, NULL);
   Tcl_CreateObjCommand(interp, "gotk_joint_active", gotk_joint_active, NULL, NULL);
+  Tcl_CreateObjCommand(interp, "gotk_joint_number", gotk_joint_number, NULL, NULL);
   Tcl_CreateObjCommand(interp, "gotk_world_pos", gotk_world_pos, NULL, NULL);
   Tcl_CreateObjCommand(interp, "gotk_world_cmd_pos", gotk_world_cmd_pos, NULL, NULL);
 

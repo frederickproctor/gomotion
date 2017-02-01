@@ -609,7 +609,7 @@ static void dbprintf(int prefix, const char * fmt, ...)
 	 }
        } else if (! strcmp(ini_entries[entry].tag, "URDF_PARAMETERS")) {
 	 /* there are always 9 of these, XYZ RPW IJK */
-	 if (9 == sscanf(ini_entries[entry].rest, "%lf %lf %lf %lf %lf %lf", &d1, &d2, &d3, &d4, &d5, &d6, &d7, &d8, &d9)) {
+	 if (9 == sscanf(ini_entries[entry].rest, "%lf %lf %lf %lf %lf %lf %lf %lf %lf", &d1, &d2, &d3, &d4, &d5, &d6, &d7, &d8, &d9)) {
 	   go_rpy rpy;
 	   go_urdf urdf;
 	   urdf.pose.tran.x = TGL(d1);
