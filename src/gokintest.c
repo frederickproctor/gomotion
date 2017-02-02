@@ -338,6 +338,7 @@ int main(int argc, char *argv[])
   double length_units_per_m;
   double rad_per_angle_units;
   double angle_units_per_rad;
+  int i1;
   double d1;
   int link_number;
   go_link link_params[MAX_JOINT_NUM];
@@ -346,7 +347,7 @@ int main(int argc, char *argv[])
   int inverse = 0;
   int jacobian = 0;
   int matrixform = 0;
-  int t;
+  int t, tt;
 
 #define mymax(a,b) ((a)>(b)?(a):(b))
   /* space to read in joints-jointvels or pos-vel */
@@ -599,6 +600,33 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "need an epsilon value\n");
       }
       continue;
+    } else if (*ptr == 'r') {
+      /* random testing */
+      while (!isspace(*ptr) && 0 != *ptr) ptr++;
+      while (isspace(*ptr)) ptr++;
+      if (1 == sscanf(ptr, "%i", &i1)) {
+	for (t = 0; t < i1; t++) {
+	  go_real joints_in[MAX_JOINT_NUM];
+	  go_real joints_out[MAX_JOINT_NUM];
+	  go_pose pose_in;
+	  go_pose pose_out;
+	  for (tt = 0; tt < link_number; tt++) {
+	    joints_in[tt] = GO_PI * go_random() - GO_PI_2;
+	    joints_out[tt] = joints_in[tt]; /* seed the estimate */
+	  }
+	  if (GO_RESULT_OK != go_kin_fwd(kinematics, joints_in, &pose_out)) {
+	    fprintf(stderr, "error on forward kinematics\n");
+	  } else if (GO_RESULT_OK != go_kin_inv(kinematics, &pose_out, joints_out)) {
+	    fprintf(stderr, "error on inverse kinematics\n");
+	  } else {
+	    printf("%f %f\n", joints_in[0], joints_out[0]);
+	  }
+	}
+      } else {
+	fprintf(stderr, "need a number of runs\n");
+      }
+      continue;
+
     } else if (*ptr == 0) {
       /* blank line */
       continue;
