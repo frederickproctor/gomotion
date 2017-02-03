@@ -7,15 +7,17 @@ from pymodbus.client.sync import ModbusTcpClient as ModbusClient
 HOST = "localhost"
 PORT = 502
 VALUE = 0
+SIM = False
 
 def print_help():
     print("-h, --host <addr>    : connect to Go Motion on address <addr>, default " + str(HOST))
     print("-p, --port <port>    : connect to Go Motion on port <addr>, default " + str(PORT))
     print("-v, --value <value>  : write <value> to the output")
+    print("-s --sim             : simulate by printing")
     print("-?, --help           : print this help message")
 
 try:
-    opts, args = getopt.getopt(sys.argv[1:], "h:p:v:?", ["host=", "port=", "value=", "help"])
+    opts, args = getopt.getopt(sys.argv[1:], "h:p:v:s?", ["host=", "port=", "value=", "sim", "help"])
 except getopt.GetoptError as err:
     print("modbus: " + str(err))
     sys.exit(1)
@@ -33,20 +35,11 @@ for o, a in opts:
         except: 
             print_help()
             sys.exit(1)
+    elif o in ("-s", "--sim"):
+        SIM = True
     elif o in ("-?", "--help"):
         print_help()
         sys.exit(0)
-
-try:
-    client = ModbusClient(HOST, PORT)
-except:
-    print("modbus: can't create client")
-    sys.exit(1)
-
-
-if not client.connect():
-    print("modbus: can't connect to " + str(HOST) + " on port " + str(PORT))
-    sys.exit(1)
 
 if VALUE >= 0:
     valout = int(3276.7 * VALUE)
@@ -60,6 +53,20 @@ else:
         valout = 32768
     elif valout > 65535: 
         valout = 65535
+
+if SIM:
+    print("modbus_write: " + str(valout))
+    sys.exit(0)
+
+try:
+    client = ModbusClient(HOST, PORT)
+except:
+    print("modbus: can't create client")
+    sys.exit(1)
+
+if not client.connect():
+    print("modbus: can't connect to " + str(HOST) + " on port " + str(PORT))
+    sys.exit(1)
 
 if not client.write_register(0x8000, valout):
     print("modbus: can't write " + str(valout))

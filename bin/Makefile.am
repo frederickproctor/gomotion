@@ -269,7 +269,3 @@ go_adapter_SOURCES = ../src/go_adapter.cpp ../src/go_adapter.hpp ../src/trajintf
 go_adapter_LDADD = ../lib/libgo.a @ULAPI_LIBS@ @MTCONNECT_LIBS@
 go_adapter_DEPENDENCIES = ../lib/libgo.a
 endif
-
-bin_PROGRAMS += ini2urdf
-ini2urdf_SOURCES = ../src/ini2urdf.c
-ini2urdf_LDADD = ../lib/libgo.a @ULAPI_LIBS@
