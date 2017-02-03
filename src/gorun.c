@@ -23,6 +23,7 @@ static enum {USE_UNIX, USE_RTAI} which_ulapi = USE_UNIX;
 #define DEFAULT_INI_FILE "gomotion.ini"
 
 #define DEFAULT_GOMAIN "gomain"
+#define DEFAULT_TOOLMAIN "toolmain"
 
 static int ini_load(char *inifile_name,
 		    char *gomain,
@@ -37,6 +38,7 @@ static int ini_load(char *inifile_name,
 		    char kinematics[INIFILE_MAX_LINELEN],
 		    int *go_log_shm_key,
 		    int *go_io_shm_key,
+		    char *toolmain,
 		    int *tool_shm_key,
 		    int *task_shm_key,
 		    int *task_tcp_port)
@@ -202,6 +204,17 @@ static int ini_load(char *inifile_name,
 
   section = "TOOL";
 
+  key = "TOOLMAIN";
+  inistring = ini_find(fp, key, section);
+  if (NULL == inistring) {
+    /* optional, make it the default */
+    strncpy(toolmain, DEFAULT_TOOLMAIN, INIFILE_MAX_LINELEN);
+    toolmain[INIFILE_MAX_LINELEN-1] = 0;
+  } else {
+    strncpy(toolmain, inistring, INIFILE_MAX_LINELEN);
+    toolmain[INIFILE_MAX_LINELEN-1] = 0;
+  }
+
   key = "SHM_KEY";
   inistring = ini_find(fp, key, section);
   if (NULL != inistring) {
@@ -291,6 +304,7 @@ int main(int argc, char *argv[])
   const char *ularg = "";
   char inifile_name[INIFILE_MAX_LINELEN] = DEFAULT_INI_FILE;
   char gomain[INIFILE_MAX_LINELEN] = DEFAULT_GOMAIN;
+  char toolmain[INIFILE_MAX_LINELEN] = DEFAULT_TOOLMAIN;
   char ext_init_string[INIFILE_MAX_LINELEN];
   int rtapi_hal_nsecs_per_period = 0;
   int go_stepper_type = 0;
@@ -393,6 +407,7 @@ int main(int argc, char *argv[])
 		    kinematics,
 		    &go_log_shm_key,
 		    &go_io_shm_key,
+		    toolmain,
 		    &tool_shm_key,
 		    &task_shm_key,
 		    &task_tcp_port)) {
@@ -552,7 +567,7 @@ int main(int argc, char *argv[])
     } else {
       result = ulapi_snprintf(path, sizeof(path)-1,
 			      "%s%s%s DEBUG=%d TOOL_SHM_KEY=%d", 
-			      dirname, ulapi_pathsep, "toolmain",
+			      dirname, ulapi_pathsep, toolmain,
 			      debug_arg ? 1 : 0,
 			      (int) tool_shm_key);
       if (result >= sizeof(path)) {
