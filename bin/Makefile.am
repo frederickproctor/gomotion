@@ -12,7 +12,7 @@ if HAVE_SDL
 AM_CPPFLAGS += @SDL_CFLAGS@
 endif
 
-EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup
+EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_write.py
 
 bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc
 
