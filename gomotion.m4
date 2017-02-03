@@ -74,7 +74,7 @@ AC_DEFUN([ACX_TCL_INCLUDE],
     [AC_ARG_WITH(tclinclude,
 	[  --with-tclinclude=<path to Tcl headers>  Specify path to Tcl headers],
 	dirs=$withval,
-	dirs="/usr/include/tcl")]
+	dirs="/usr/include/tcl*")]
     for dir in $dirs ; do
 	if test -f $dir/tcl.h ; then tclinclude_dir=$dir ; break; fi
     done
@@ -123,7 +123,7 @@ AC_DEFUN([ACX_TK_INCLUDE],
     [AC_ARG_WITH(tkinclude,
 	[  --with-tkinclude=<path to Tk headers>  Specify path to Tk headers],
 	dirs=$withval,
-	dirs="/usr/include/tk")]
+	dirs="/usr/include/tcl* /usr/include/tk*")]
     for dir in $dirs ; do
 	if test -f $dir/tk.h ; then tkinclude_dir=$dir ; break; fi
     done
