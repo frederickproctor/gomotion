@@ -9,15 +9,15 @@ PORT = 502
 VALUE = 0
 
 def print_help():
-    print "-h, --host <addr>    : connect to Go Motion on address <addr>, default", HOST
-    print "-p, --port <port>    : connect to Go Motion on port <addr>, default", PORT
-    print "-v, --value <value>  : write <value> to the output"
-    print "-?, --help           : print this help message"
+    print("-h, --host <addr>    : connect to Go Motion on address <addr>, default " + str(HOST))
+    print("-p, --port <port>    : connect to Go Motion on port <addr>, default " + str(PORT))
+    print("-v, --value <value>  : write <value> to the output")
+    print("-?, --help           : print this help message")
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h:p:v:?", ["host=", "port=", "value=", "help"])
 except getopt.GetoptError, err:
-    print "modbus: ", str(err)
+    print("modbus: " + str(err))
     sys.exit(1)
 
 for o, a in opts:
@@ -40,12 +40,12 @@ for o, a in opts:
 try:
     client = ModbusClient(HOST, PORT)
 except:
-    print "modbus: can't create client"
+    print("modbus: can't create client")
     sys.exit(1)
 
 
 if not client.connect():
-    print "modbus: can't connect to", HOST, "on port", PORT
+    print("modbus: can't connect to " + str(HOST) + " on port " + str(PORT))
     sys.exit(1)
 
 if VALUE >= 0:
@@ -62,6 +62,6 @@ else:
         valout = 65535
 
 if not client.write_register(0x8000, valout):
-    print "modbus: can't write", valout
+    print("modbus: can't write " + str(valout))
 
 sys.exit(0)
