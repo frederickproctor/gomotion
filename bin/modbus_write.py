@@ -16,7 +16,7 @@ def print_help():
 
 try:
     opts, args = getopt.getopt(sys.argv[1:], "h:p:v:?", ["host=", "port=", "value=", "help"])
-except getopt.GetoptError, err:
+except getopt.GetoptError as err:
     print("modbus: " + str(err))
     sys.exit(1)
 
