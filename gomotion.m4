@@ -69,27 +69,27 @@ dnl put HAVE_IOPL in config.h
 	fi
 )
 
-AC_DEFUN([ACX_TK_INCLUDE],
-    [AC_MSG_CHECKING([for Tk headers])]
-    [AC_ARG_WITH(tkinclude,
-	[  --with-tkinclude=<path to Tk headers>  Specify path to Tk headers],
+AC_DEFUN([ACX_TCL_INCLUDE],
+    [AC_MSG_CHECKING([for Tcl headers])]
+    [AC_ARG_WITH(tclinclude,
+	[  --with-tclinclude=<path to Tcl headers>  Specify path to Tcl headers],
 	dirs=$withval,
-	dirs="/usr/include/tk")]
+	dirs="/usr/include/tcl*")]
     for dir in $dirs ; do
-	if test -f $dir/tk.h ; then tkinclude_dir=$dir ; break; fi
+	if test -f $dir/tcl.h ; then tclinclude_dir=$dir ; break; fi
     done
-    if test x$tkinclude_dir = x ; then
-	[AC_MSG_RESULT([not found in $dirs, try --with-tkinclude=<path to Tk headers>])]
+    if test x$tclinclude_dir = x ; then
+	[AC_MSG_RESULT([not found in $dirs, try --with-tclinclude=<path to Tcl headers>])]
     else
-	TK_INCLUDE_DIR=$tkinclude_dir
-dnl put HAVE_TK_INCLUDE in config.h
-	[AC_DEFINE(HAVE_TK_INCLUDE,
-		1, [Define non-zero if you have Tk headers.])]
-dnl put TK_INCLUDE_DIR in Makefile
-	[AC_SUBST(TK_INCLUDE_DIR)]
-	[AC_MSG_RESULT([$TK_INCLUDE_DIR])]
+	TCL_INCLUDE_DIR=$tclinclude_dir
+dnl put HAVE_TCL_INCLUDE in config.h
+	[AC_DEFINE(HAVE_TCL_INCLUDE,
+		1, [Define non-zero if you have Tcl headers.])]
+dnl put TCL_INCLUDE_DIR in Makefile
+	[AC_SUBST(TCL_INCLUDE_DIR)]
+	[AC_MSG_RESULT([$TCL_INCLUDE_DIR])]
     fi
-    [AM_CONDITIONAL(HAVE_TK_INCLUDE, test x$tkinclude_dir != x)]
+    [AM_CONDITIONAL(HAVE_TCL_INCLUDE, test x$tclinclude_dir != x)]
 )
 
 AC_DEFUN([ACX_TCL_LIB],
@@ -116,6 +116,29 @@ dnl put TCL_LINK in Makefile
 	[AC_MSG_RESULT([$TCL_LINK])]
     fi
     [AM_CONDITIONAL(HAVE_TCL_LIB, test x"$tcllink" != x)]
+)
+
+AC_DEFUN([ACX_TK_INCLUDE],
+    [AC_MSG_CHECKING([for Tk headers])]
+    [AC_ARG_WITH(tkinclude,
+	[  --with-tkinclude=<path to Tk headers>  Specify path to Tk headers],
+	dirs=$withval,
+	dirs="/usr/include/tcl* /usr/include/tk*")]
+    for dir in $dirs ; do
+	if test -f $dir/tk.h ; then tkinclude_dir=$dir ; break; fi
+    done
+    if test x$tkinclude_dir = x ; then
+	[AC_MSG_RESULT([not found in $dirs, try --with-tkinclude=<path to Tk headers>])]
+    else
+	TK_INCLUDE_DIR=$tkinclude_dir
+dnl put HAVE_TK_INCLUDE in config.h
+	[AC_DEFINE(HAVE_TK_INCLUDE,
+		1, [Define non-zero if you have Tk headers.])]
+dnl put TK_INCLUDE_DIR in Makefile
+	[AC_SUBST(TK_INCLUDE_DIR)]
+	[AC_MSG_RESULT([$TK_INCLUDE_DIR])]
+    fi
+    [AM_CONDITIONAL(HAVE_TK_INCLUDE, test x$tkinclude_dir != x)]
 )
 
 AC_DEFUN([ACX_TK_LIB],
@@ -383,14 +406,15 @@ AC_DEFUN([ACX_HAVE_LIBGSL],
 	[AC_CHECK_LIB([gslcblas],[cblas_dgemm])]
 	[AC_CHECK_LIB([gsl],[gsl_blas_dgemm])]
 dnl exploit variable generated inside configure script
-	[AM_CONDITIONAL(HAVE_LIBGSL, test x$ac_cv_lib_gsl_gsl_blas_dgemm = xyes)]
+ 	[AM_CONDITIONAL(HAVE_LIBGSL, test x$ac_cv_lib_gsl_gsl_blas_dgemm = xyes)]
 )
 
 AC_DEFUN([ACX_PRE_GOMOTION],
 	[ACX_ULAPI]
 	[ACX_SYSTEM_TYPE]
-	[ACX_TK_INCLUDE]
+	[ACX_TCL_INCLUDE]
 	[ACX_TCL_LIB]
+	[ACX_TK_INCLUDE]
 	[ACX_TK_LIB]
 	[ACX_KERNEL_SOURCE]
 	[ACX_HAVE_IOPORTS]

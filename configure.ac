@@ -1,4 +1,4 @@
-AC_INIT([gomotion], [1.29])
+AC_INIT([gomotion], [1.30])
 AC_CONFIG_AUX_DIR([config])
 AC_CONFIG_SRCDIR([src/go.c])
 AC_CONFIG_HEADERS([config/config.h])

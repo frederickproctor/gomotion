@@ -459,8 +459,11 @@ static void do_cmd_stop(traj_stat_struct * stat, traj_set_struct * set, traj_ref
 #endif
 	/* convert from ECP to KCP to before using the kinematics */
 	go_pose_pose_mult(&ecp.u.pose, &set->tool_transform_inv, &kcp);
+	for (servo_num = 0; servo_num < set->joint_num; servo_num++) {
+	  joints[servo_num] = stat->joints[servo_num]; /* seed the estimate */
+	}
 	if (GO_RESULT_OK != go_kin_inv(kinematics, &kcp, joints)) {
-	  rtapi_print("trajloop: can't invert\n");
+	  rtapi_print("trajloop: do_cmd_stop: can't invert\n");
 	  go_status_next(stat, GO_RCS_STATUS_ERROR);
 	  go_state_next(stat, GO_RCS_STATE_S0);
 	} else {
@@ -1088,8 +1091,11 @@ static void do_cmd_move_world_or_tool(go_flag world, traj_cmd_struct * cmd, traj
 #endif
       /* convert from ECP to KCP to before using the kinematics */
       go_pose_pose_mult(&ecp.u.pose, &set->tool_transform_inv, &stat->kcp);
+      for (servo_num = 0; servo_num < set->joint_num; servo_num++) {
+	joints[servo_num] = stat->joints[servo_num]; /* seed the estimate */
+      }
       if (GO_RESULT_OK != go_kin_inv(kinematics, &stat->kcp, joints)) {
-	rtapi_print("trajloop: can't invert\n");
+	rtapi_print("trajloop: do_cmd_move_world_or_tool: can't invert\n");
 	stat->inpos = 1;
 	go_status_next(stat, GO_RCS_STATUS_ERROR);
 	go_state_next(stat, GO_RCS_STATE_S0);

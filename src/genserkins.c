@@ -106,7 +106,8 @@ go_result genser_kin_set_parameters(void * kins, go_link * params, go_integer nu
   for (t = 0; t < num; t++) {
     /* we only handle serial-type link params */
     if (params[t].type != GO_LINK_DH &&
-	params[t].type != GO_LINK_PP) return GO_RESULT_BAD_ARGS;
+	params[t].type != GO_LINK_PP &&
+	params[t].type != GO_LINK_URDF) return GO_RESULT_BAD_ARGS;
     genser->links[t] = params[t];
   }
   genser->link_num = num;
@@ -395,14 +396,32 @@ go_result genser_kin_compute_jfwd(go_link * link_params, int link_number, go_mat
   go_matrix_init(scratch, scratchstg, 3, link_number);
   go_matrix_init(R_inv, R_invstg, 3, 3);
 
-  Jv.el[0][0] = 0, Jv.el[1][0] = 0, Jv.el[2][0] = (GO_QUANTITY_LENGTH == link_params[0].quantity ? 1 : 0);
-  Jw.el[0][0] = 0, Jw.el[1][0] = 0, Jw.el[2][0] = (GO_QUANTITY_ANGLE == link_params[0].quantity ? 1 : 0);
+  if (GO_LINK_URDF == link_params[0].type) {
+    /* move about general axis */
+    if (GO_QUANTITY_LENGTH == link_params[0].quantity) {
+      Jv.el[0][0] = link_params[0].u.urdf.axis.x;
+      Jv.el[1][0] = link_params[0].u.urdf.axis.y;
+      Jv.el[2][0] = link_params[0].u.urdf.axis.z;
+      Jw.el[0][0] = 0, Jw.el[1][0] = 0, Jw.el[2][0] = 0;
+    } else {
+      Jw.el[0][0] = link_params[0].u.urdf.axis.x;
+      Jw.el[1][0] = link_params[0].u.urdf.axis.y;
+      Jw.el[2][0] = link_params[0].u.urdf.axis.z;
+      Jv.el[0][0] = 0, Jv.el[1][0] = 0, Jv.el[2][0] = 0;
+    }
+  } else {
+    /* rotation or translate about Z by convention */
+    Jv.el[0][0] = 0, Jv.el[1][0] = 0, Jv.el[2][0] = (GO_QUANTITY_LENGTH == link_params[0].quantity ? 1 : 0);
+    Jw.el[0][0] = 0, Jw.el[1][0] = 0, Jw.el[2][0] = (GO_QUANTITY_ANGLE == link_params[0].quantity ? 1 : 0);
+  }
 
   /* initialize inverse rotational transform */
   if (GO_LINK_DH == link_params[0].type) {
     go_dh_pose_convert(&link_params[0].u.dh, &pose);
   } else if (GO_LINK_PP == link_params[0].type) {
     pose = link_params[0].u.pp.pose;
+  } else if (GO_LINK_URDF == link_params[0].type) {
+    pose = link_params[0].u.urdf.pose;
   } else {
     return GO_RESULT_IMPL_ERROR;
   }
@@ -415,6 +434,8 @@ go_result genser_kin_compute_jfwd(go_link * link_params, int link_number, go_mat
       go_dh_pose_convert(&link_params[col].u.dh, &pose);
     } else if (GO_LINK_PP == link_params[col].type) {
       pose = link_params[col].u.pp.pose;
+    } else if (GO_LINK_URDF == link_params[col].type) {
+      pose = link_params[col].u.urdf.pose;
     } else {
       return GO_RESULT_IMPL_ERROR;
     }
@@ -427,14 +448,40 @@ go_result genser_kin_compute_jfwd(go_link * link_params, int link_number, go_mat
     go_matrix_vector_cross(&Jw, P_ip1_i, &scratch);
     go_matrix_matrix_add(&Jv, &scratch, &scratch);
     go_matrix_matrix_mult(&R_i_ip1, &scratch, &Jv);
-    Jv.el[0][col] = 0, Jv.el[1][col] = 0, Jv.el[2][col] = (GO_QUANTITY_LENGTH == link_params[col].quantity ? 1 : 0);
+
+    if (GO_LINK_URDF == link_params[col].type) {
+      if (GO_QUANTITY_LENGTH == link_params[col].quantity) {
+	Jv.el[0][col] = link_params[col].u.urdf.axis.x;
+	Jv.el[1][col] = link_params[col].u.urdf.axis.y;
+	Jv.el[2][col] = link_params[col].u.urdf.axis.z;
+      } else {
+	Jv.el[0][col] = 0, Jv.el[1][col] = 0, Jv.el[2][col] = 0;
+      }
+    } else {
+      Jv.el[0][col] = 0, Jv.el[1][col] = 0, Jv.el[2][col] = (GO_QUANTITY_LENGTH == link_params[col].quantity ? 1 : 0);
+    }
+
     /* Jw */
     go_matrix_matrix_mult(&R_i_ip1, &Jw, &Jw);
-    Jw.el[0][col] = 0, Jw.el[1][col] = 0, Jw.el[2][col] = (GO_QUANTITY_ANGLE == link_params[col].quantity ? 1 : 0);
+
+    if (GO_LINK_URDF == link_params[col].type) {
+      if (GO_QUANTITY_ANGLE == link_params[col].quantity) {
+	Jw.el[0][col] = link_params[col].u.urdf.axis.x;
+	Jw.el[1][col] = link_params[col].u.urdf.axis.y;
+	Jw.el[2][col] = link_params[col].u.urdf.axis.z;
+      } else {
+	Jw.el[0][col] = 0, Jw.el[1][col] = 0, Jw.el[2][col] = 0;
+      }
+    } else {
+      Jw.el[0][col] = 0, Jw.el[1][col] = 0, Jw.el[2][col] = (GO_QUANTITY_ANGLE == link_params[col].quantity ? 1 : 0);
+    }
+
     if (GO_LINK_DH == link_params[col].type) {
       go_dh_pose_convert(&link_params[col].u.dh, &pose);
     } else if (GO_LINK_PP == link_params[col].type) {
       pose = link_params[col].u.pp.pose;
+    } else if (GO_LINK_URDF == link_params[col].type) {
+      pose = link_params[col].u.urdf.pose;
     } else {
       return GO_RESULT_IMPL_ERROR;
     }
@@ -477,7 +524,7 @@ go_result genser_kin_compute_jinv(go_matrix * Jfwd, go_matrix * Jinv, go_vector 
     GO_MATRIX_DECLARE(JT, JTstg, GENSER_MAX_JOINTS, 6);
     GO_MATRIX_DECLARE(JJT, JJTstg, 6, 6);
     GO_MATRIX_DECLARE(Minv, Minvstg, GENSER_MAX_JOINTS, GENSER_MAX_JOINTS);
-    
+
     go_matrix_init(JT, JTstg, Jfwd->cols, Jfwd->rows);
     go_matrix_init(JJT, JJTstg, Jfwd->rows, Jfwd->rows);
     go_matrix_init(Minv, Minvstg, Jfwd->cols, Jfwd->cols);
@@ -496,7 +543,9 @@ go_result genser_kin_compute_jinv(go_matrix * Jfwd, go_matrix * Jinv, go_vector 
     go_matrix_matrix_mult(&Minv, &JT, &JT);
     go_matrix_matrix_mult(Jfwd, &JT, &JJT);
     retval = go_matrix_inv(&JJT, &JJT);
-    if (GO_RESULT_OK != retval) return retval;
+    if (GO_RESULT_OK != retval) {
+      return retval;
+    }
     go_matrix_matrix_mult(&JT, &JJT, Jinv);
     go_matrix_matrix_mult(&Minv, Jinv, Jinv);
   } else {

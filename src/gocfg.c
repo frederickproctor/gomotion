@@ -558,6 +558,8 @@ static void dbprintf(int prefix, const char * fmt, ...)
 		   ini_entries[entry].rest)
 	   REPORT_BAD;
 	 /* now the TGQ macro will work */
+       } else if (! strcmp(ini_entries[entry].tag, "NAME")) {
+	 /* Go Motion ignores names, but they may be used by others */
        } else if (! strcmp(ini_entries[entry].tag, "DEBUG")) {
 	 if (1 == sscanf(ini_entries[entry].rest, "%i", &i1)) {
 	   debug = i1;
@@ -601,6 +603,30 @@ static void dbprintf(int prefix, const char * fmt, ...)
 	   go_rpy_quat_convert(&rpy, &pp.pose.rot);
 	   link_params[joint_num - 1].u.pp = pp;
 	   link_params[joint_num - 1].type = GO_LINK_PP;
+	   saw_link_params = 1;
+	 } else {
+	   REPORT_BAD;
+	 }
+       } else if (! strcmp(ini_entries[entry].tag, "URDF_PARAMETERS")) {
+	 /* there are always 9 of these, XYZ RPW IJK */
+	 if (9 == sscanf(ini_entries[entry].rest, "%lf %lf %lf %lf %lf %lf %lf %lf %lf", &d1, &d2, &d3, &d4, &d5, &d6, &d7, &d8, &d9)) {
+	   go_rpy rpy;
+	   go_urdf urdf;
+	   urdf.pose.tran.x = TGL(d1);
+	   urdf.pose.tran.y = TGL(d2);
+	   urdf.pose.tran.z = TGL(d3);
+	   rpy.r = TGA(d4);
+	   rpy.p = TGA(d5);
+	   rpy.y = TGA(d6);
+	   go_rpy_quat_convert(&rpy, &urdf.pose.rot);
+	   urdf.axis.x = TGL(d7);
+	   urdf.axis.y = TGL(d8);
+	   urdf.axis.z = TGL(d9);
+	   if (GO_RESULT_OK != go_cart_unit(&urdf.axis, &urdf.axis)) {
+	     REPORT_BAD;
+	   }
+	   link_params[joint_num - 1].u.urdf = urdf;
+	   link_params[joint_num - 1].type = GO_LINK_URDF;
 	   saw_link_params = 1;
 	 } else {
 	   REPORT_BAD;

@@ -1,7 +1,7 @@
 #!/bin/sh
 # run as "scripts/raster.tcl -- -i etc/genhexh.ini -u rtai"
 # the next line restarts using gotcl \
-exec /usr/local/proj/gomotion/bin/gotcl "$0" -- "$@"
+exec /usr/local/bin/gotcl "$0" -- "$@"
 
 puts "inifile is [gotk_inifile]"
 

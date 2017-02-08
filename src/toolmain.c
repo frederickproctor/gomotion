@@ -80,6 +80,9 @@ static void do_cmd_abort(tool_stat_struct *stat, tool_set_struct *set)
 
 static void do_cmd_on(tool_cmd_struct *cmd, tool_stat_struct *stat, tool_set_struct *set)
 {
+  enum {CMD_ON_STR_LEN = 256};
+  char cmd_on_str[CMD_ON_STR_LEN];
+
   if (go_state_match(stat, GO_RCS_STATE_NEW_COMMAND)) {
     CMD_PRINT_3("tool: cmd [%d] on %f\n", (int) cmd->id, (double) cmd->u.on.value);
     go_state_new(stat);
@@ -87,6 +90,14 @@ static void do_cmd_on(tool_cmd_struct *cmd, tool_stat_struct *stat, tool_set_str
       go_status_next(stat, GO_RCS_STATUS_ERROR);
     } else {
       stat->value[cmd->id] = cmd->u.on.value;
+      /*
+	Insert custom application calls here, e.g.,
+	system("bin/modbus_write.py -v 4 -s");
+       */
+#if 1
+      rtapi_snprintf(cmd_on_str, sizeof(cmd_on_str), "bin/modbus_write.py -v %f -s", (double) cmd->u.on.value);
+      system(cmd_on_str);
+#endif
       go_status_next(stat, GO_RCS_STATUS_DONE);
     }
     go_state_next(stat, GO_RCS_STATE_S0);
@@ -104,6 +115,7 @@ static void do_cmd_off(tool_cmd_struct *cmd, tool_stat_struct *stat, tool_set_st
       go_status_next(stat, GO_RCS_STATUS_ERROR);
     } else {
       stat->value[cmd->id] = 0.0;
+      /* FIXME -- add custom off command */
       go_status_next(stat, GO_RCS_STATUS_DONE);
     }
     go_state_next(stat, GO_RCS_STATE_S0);

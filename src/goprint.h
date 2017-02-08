@@ -33,6 +33,7 @@ extern void go_rpy_print(const go_rpy *rpy);
 extern void go_mat_print(const go_mat *m);
 extern void go_rvec_print(const go_rvec *rvec);
 extern void go_quat_print(const go_quat *quat);
+extern void go_matrix_print(const go_matrix *m);
 
 #if 0
 {

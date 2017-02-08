@@ -1,23 +1,20 @@
 /*!
-  \file gotk.c
+  \file gotcl.c
 
-  \brief C code for common Tk main interfaces to Go Motion.
+  \brief C code for common Tcl main interfaces to Go Motion.
 */
 
 #include <stdio.h>		/* fprintf, stderr, FILE */
 #include <stddef.h>		/* sizeof, NULL */
 #include <stdlib.h>		/* exit, atexit */
 #include <signal.h>		/* signal, SIGINT */
-#include <tk.h>			/* Tk_XXX */
+#include <tcl.h>		/* Tcl_XXX */
 #include "gotcltk.h"		/* gotk_xxx */
 
-static int
-Tk_AppInit(Tcl_Interp * interp)
+int
+Tcl_AppInit(Tcl_Interp * interp)
 {
   if (Tcl_Init(interp) == TCL_ERROR) {
-    return TCL_ERROR;
-  }
-  if (Tk_Init(interp) == TCL_ERROR) {
     return TCL_ERROR;
   }
 
@@ -32,13 +29,6 @@ static void sigquit(int sig)
 }
 
 /*
-  Built as either 'gotk' or 'gotcl', with or without windowing support,
-  respectively.
-
-  We will be called with a script as something like
-
-  gotk pendant.tcl {args to Tcl} -- {args for us}
-
   Interactively, call with a script '-' to represent stdin, e.g.,
 
   gotcl - -- -i gomotion.ini
@@ -61,7 +51,7 @@ int main(int argc, char *argv[])
 
   signal(SIGINT, sigquit);
   atexit(gotk_exit);
-  Tk_Main(argc, argv, Tk_AppInit);
+  Tcl_Main(argc, argv, Tcl_AppInit);
 
   return 0;
 }

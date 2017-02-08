@@ -17,6 +17,7 @@ goprint.h \
 gorcs.h \
 gorcsutil.h \
 gostepper.h \
+gotcltk.h \
 gotraj.h \
 gotypes.h \
 goutil.h \

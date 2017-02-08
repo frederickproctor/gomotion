@@ -4010,6 +4010,7 @@ go_result go_link_joint_set(const go_link * link, go_real joint, go_link * linko
 {
   go_pose pose;
   go_rvec rvec;
+  go_cart cart;
   go_result retval;
   go_integer i, j;
 
@@ -4044,6 +4045,21 @@ go_result go_link_joint_set(const go_link * link, go_real joint, go_link * linko
     retval = go_rvec_quat_convert(&rvec, &pose.rot);
     if (GO_RESULT_OK != retval) return retval;
     return go_pose_pose_mult(&link->u.pp.pose, &pose, &linkout->u.pp.pose);
+  }
+
+  if (GO_LINK_URDF == link->type) {
+    linkout->u.urdf.axis = link->u.urdf.axis;
+    pose = go_pose_identity();
+    if (GO_QUANTITY_LENGTH == link->quantity) {
+      go_cart_scale_mult(&link->u.urdf.axis, joint, &pose.tran);
+      return go_pose_pose_mult(&link->u.urdf.pose, &pose, &linkout->u.urdf.pose);
+    }
+    /* else revolute */
+    go_cart_scale_mult(&link->u.urdf.axis, joint, &cart);
+    go_cart_rvec_convert(&cart, &rvec);
+    retval = go_rvec_quat_convert(&rvec, &pose.rot);
+    if (GO_RESULT_OK != retval) return retval;
+    return go_pose_pose_mult(&link->u.urdf.pose, &pose, &linkout->u.urdf.pose);
   }
 
   if (GO_LINK_PK == link->type) {
@@ -4082,6 +4098,8 @@ go_result go_link_pose_build(const go_link * link_params, go_integer num, go_pos
       go_pose_pose_mult(pose, &p, pose);
     } else if (GO_LINK_PP == link_params[link].type) {
       go_pose_pose_mult(pose, &link_params[link].u.pp.pose, pose);
+    } else if (GO_LINK_URDF == link_params[link].type) {
+      go_pose_pose_mult(pose, &link_params[link].u.urdf.pose, pose);
     } else {
       return GO_RESULT_ERROR;
     }

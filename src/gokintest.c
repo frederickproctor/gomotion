@@ -236,6 +236,30 @@ ini_load(char * inifile_name,
 	fprintf(stderr, "bad entry: [%s] PP = %s\n", servo_string, inistring);
 	CLOSE_AND_RETURN(1);
       }
+    } else if (NULL != (inistring = ini_find(fp, "URDF_PARAMETERS", servo_string))) {
+      if (9 == sscanf(inistring, "%lf %lf %lf %lf %lf %lf %lf %lf %lf", &d1, &d2, &d3, &d4, &d5, &d6, &d7, &d8, &d9)) {
+	go_rpy rpy;
+	go_cart cart;
+	link_params[link].u.urdf.pose.tran.x = (go_real) (*m_per_length_units * d1);
+	link_params[link].u.urdf.pose.tran.y = (go_real) (*m_per_length_units * d2);
+	link_params[link].u.urdf.pose.tran.z = (go_real) (*m_per_length_units * d3);
+	rpy.r = (go_real) (*rad_per_angle_units * d4);
+	rpy.p = (go_real) (*rad_per_angle_units * d5);
+	rpy.y = (go_real) (*rad_per_angle_units * d6);
+	go_rpy_quat_convert(&rpy, &link_params[link].u.urdf.pose.rot);
+	cart.x = (go_real) (*m_per_length_units * d7);
+	cart.y = (go_real) (*m_per_length_units * d8);
+	cart.z = (go_real) (*m_per_length_units * d9);
+	if (GO_RESULT_OK != go_cart_unit(&cart, &cart)) {
+	  fprintf(stderr, "bad entry: [%s] URDF = %s\n", servo_string, inistring);
+	  CLOSE_AND_RETURN(1);
+	}
+	link_params[link].u.urdf.axis = cart;
+	link_params[link].type = GO_LINK_URDF;
+      } else {
+	fprintf(stderr, "bad entry: [%s] PP = %s\n", servo_string, inistring);
+	CLOSE_AND_RETURN(1);
+      }
     } else if (NULL != (inistring = ini_find(fp, "PK_PARAMETERS", servo_string))) {
       if (6 == sscanf(inistring, "%lf %lf %lf %lf %lf %lf", &d1, &d2, &d3, &d4, &d5, &d6)) {
 	link_params[link].u.pk.base.x = (go_real) (*m_per_length_units * d1);
@@ -259,6 +283,41 @@ ini_load(char * inifile_name,
   CLOSE_AND_RETURN(0);
 }
 
+static void print_params(go_link *link_params, int link_number)
+{
+  go_rpy rpy;
+  int t;
+
+  for (t = 0; t < link_number; t++) {
+    if (GO_LINK_DH == link_params[t].type) {
+      printf("%d: %.3f %.3f %.3f %.3f\n", t+1, 
+	     link_params[t].u.dh.a,
+	     link_params[t].u.dh.alpha,
+	     link_params[t].u.dh.d,
+	     link_params[t].u.dh.theta);
+    } else if (GO_LINK_PP == link_params[t].type) {
+      go_quat_rpy_convert(&link_params[t].u.pp.pose.rot, &rpy);
+      printf("%d: %.3f %.3f %.3f / %.3f %.3f %.3f\n", t+1, 
+	     link_params[t].u.urdf.pose.tran.x,
+	     link_params[t].u.urdf.pose.tran.y,
+	     link_params[t].u.urdf.pose.tran.z,
+	     rpy.r, rpy.p, rpy.y);
+    } else if (GO_LINK_URDF == link_params[t].type) {
+      go_quat_rpy_convert(&link_params[t].u.urdf.pose.rot, &rpy);
+      printf("%d: %.3f %.3f %.3f / %.3f %.3f %.3f / %.3f %.3f %.3f\n", t+1, 
+	     link_params[t].u.urdf.pose.tran.x,
+	     link_params[t].u.urdf.pose.tran.y,
+	     link_params[t].u.urdf.pose.tran.z,
+	     rpy.r, rpy.p, rpy.y,
+	     link_params[t].u.urdf.axis.x,
+	     link_params[t].u.urdf.axis.y,
+	     link_params[t].u.urdf.axis.z);
+    } else {
+      printf("unknown\n");
+    }
+  }
+}
+
 /*
   Syntax: gokintest -i <ini file>
 */
@@ -279,6 +338,7 @@ int main(int argc, char *argv[])
   double length_units_per_m;
   double rad_per_angle_units;
   double angle_units_per_rad;
+  int i1;
   double d1;
   int link_number;
   go_link link_params[MAX_JOINT_NUM];
@@ -287,7 +347,7 @@ int main(int argc, char *argv[])
   int inverse = 0;
   int jacobian = 0;
   int matrixform = 0;
-  int t;
+  int t, tt;
 
 #define mymax(a,b) ((a)>(b)?(a):(b))
   /* space to read in joints-jointvels or pos-vel */
@@ -508,6 +568,9 @@ int main(int argc, char *argv[])
     } else if (*ptr == 'k') {
       jacobian = 0;
       continue;
+    } else if (*ptr == 'l') {
+      print_params(link_params, link_number);
+      continue;
     } else if (*ptr == 'm') {
       matrixform = !matrixform;
       continue;
@@ -537,6 +600,33 @@ int main(int argc, char *argv[])
 	fprintf(stderr, "need an epsilon value\n");
       }
       continue;
+    } else if (*ptr == 'r') {
+      /* random testing */
+      while (!isspace(*ptr) && 0 != *ptr) ptr++;
+      while (isspace(*ptr)) ptr++;
+      if (1 == sscanf(ptr, "%i", &i1)) {
+	for (t = 0; t < i1; t++) {
+	  go_real joints_in[MAX_JOINT_NUM];
+	  go_real joints_out[MAX_JOINT_NUM];
+	  go_pose pose_in;
+	  go_pose pose_out;
+	  for (tt = 0; tt < link_number; tt++) {
+	    joints_in[tt] = GO_PI * go_random() - GO_PI_2;
+	    joints_out[tt] = joints_in[tt]; /* seed the estimate */
+	  }
+	  if (GO_RESULT_OK != go_kin_fwd(kinematics, joints_in, &pose_out)) {
+	    fprintf(stderr, "error on forward kinematics\n");
+	  } else if (GO_RESULT_OK != go_kin_inv(kinematics, &pose_out, joints_out)) {
+	    fprintf(stderr, "error on inverse kinematics\n");
+	  } else {
+	    printf("%f %f\n", joints_in[0], joints_out[0]);
+	  }
+	}
+      } else {
+	fprintf(stderr, "need a number of runs\n");
+      }
+      continue;
+
     } else if (*ptr == 0) {
       /* blank line */
       continue;
