@@ -28,6 +28,8 @@
 #include "extintf.h"
 #include "servointf.h"		/* SERVO_NUM */
 
+#define BAUD 9600
+
 /* FIXME - testing, ulapi calls shouldn't really be in here */
 extern double ulapi_time(void);
 
@@ -81,7 +83,7 @@ void taskcode(void *args)
 
   if (NULL != serial_id) {
     /* send some good values for V and A */
-    rtapi_snprintf(buffer, sizeof(buffer) - 1, "V=%d A=%d G\r", DEFAULT_VEL, DEFAULT_ACC);
+    rtapi_snprintf(buffer, sizeof(buffer) - 1, "V=%d A=%d\r", DEFAULT_VEL, DEFAULT_ACC);
     buffer[sizeof(buffer) - 1] = 0;
     rtapi_mutex_take(mutex);
     (void) rtapi_serial_write(serial_id, buffer, strlen(buffer));
@@ -181,7 +183,7 @@ go_result ext_init(char *init_string)
 	  args->serial_id = NULL;
 	  /* setting serial_id to NULL flags that this port should be stubbed */
 	}
-	rtapi_serial_baud(args->serial_id, 9600);
+	rtapi_serial_baud(args->serial_id, BAUD);
 	rtapi_serial_set_nonblocking(args->serial_id);
       }
 
