@@ -1227,6 +1227,8 @@ static void dbprintf(int prefix, const char * fmt, ...)
 	  saw_cycle_time = 1;
 	} else
 	  REPORT_BAD;
+      } else if (! strcmp(ini_entries[entry].tag, "TOOLMAIN")) {
+	/* ignore this, it's used by 'gorun' directly */
       } else
 	fprintf(stderr, "gocfg: warning: unrecognized entry: [%s] %s = %s\n",
 		section, ini_entries[entry].tag, ini_entries[entry].rest);

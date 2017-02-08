@@ -1,14 +1,3 @@
-/*
-  DISCLAIMER:
-  This software was produced by the National Institute of Standards
-  and Technology (NIST), an agency of the U.S. government, and by statute is
-  not subject to copyright in the United States.  Recipients of this software
-  assume all responsibility associated with its operation, modification,
-  maintenance, and subsequent redistribution.
-
-  See NIST Administration Manual 4.09.07 b and Appendix I. 
-*/
-
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -20,7 +9,7 @@
 #include "gorcs.h"
 #include "toolintf.h"
 
-#define DEFAULT_CYCLE_TIME 0.1
+#define DEFAULT_CYCLE_TIME 0.010
 
 #define CMD_PRINT_1(x) if (set->debug & DEBUG_CMD) rtapi_print(x)
 #define CMD_PRINT_2(x,y) if (set->debug & DEBUG_CMD) rtapi_print(x, y)
@@ -30,6 +19,8 @@
 #define CFG_PRINT_2(x,y) if (set->debug & DEBUG_CFG) rtapi_print(x, y)
 #define CFG_PRINT_3(x,y,z) if (set->debug & DEBUG_CFG) rtapi_print(x, y, z)
 #define CFG_PRINT_4(x,y,z,u) if (set->debug & DEBUG_CFG) rtapi_print(x, y, z, u)
+
+enum {CMD_STR_LEN = 256};
 
 static void do_cmd_nop(tool_stat_struct *stat, tool_set_struct *set)
 {
@@ -80,14 +71,25 @@ static void do_cmd_abort(tool_stat_struct *stat, tool_set_struct *set)
 
 static void do_cmd_on(tool_cmd_struct *cmd, tool_stat_struct *stat, tool_set_struct *set)
 {
+  char cmd_str[CMD_STR_LEN];
+  rtapi_integer result;
+
   if (go_state_match(stat, GO_RCS_STATE_NEW_COMMAND)) {
     CMD_PRINT_3("tool: cmd [%d] on %f\n", (int) cmd->id, (double) cmd->u.on.value);
     go_state_new(stat);
     if (GO_ARRAYBAD(stat->value, cmd->id)) {
       go_status_next(stat, GO_RCS_STATUS_ERROR);
     } else {
-      stat->value[cmd->id] = cmd->u.on.value;
-      go_status_next(stat, GO_RCS_STATUS_DONE);
+      /* FIXME -- remove -s option for simulation */
+      rtapi_snprintf(cmd_str, sizeof(cmd_str), "bin/modbus_write -v %f -s", (double) cmd->u.on.value);
+      rtapi_system(cmd_str, &result);
+      if (RTAPI_OK == result) {
+	stat->value[cmd->id] = cmd->u.on.value;
+	go_status_next(stat, GO_RCS_STATUS_DONE);
+      } else {
+	/* leave status value unchanged */
+	go_status_next(stat, GO_RCS_STATUS_ERROR);
+      }
     }
     go_state_next(stat, GO_RCS_STATE_S0);
   } else {			/* S0 */
@@ -97,14 +99,25 @@ static void do_cmd_on(tool_cmd_struct *cmd, tool_stat_struct *stat, tool_set_str
 
 static void do_cmd_off(tool_cmd_struct *cmd, tool_stat_struct *stat, tool_set_struct *set)
 {
+  char cmd_str[CMD_STR_LEN];
+  rtapi_integer result;
+
   if (go_state_match(stat, GO_RCS_STATE_NEW_COMMAND)) {
     CMD_PRINT_2("tool: cmd [%d] off\n", (int) cmd->id);
     go_state_new(stat);
     if (GO_ARRAYBAD(stat->value, cmd->id)) {
       go_status_next(stat, GO_RCS_STATUS_ERROR);
     } else {
-      stat->value[cmd->id] = 0.0;
-      go_status_next(stat, GO_RCS_STATUS_DONE);
+      /* FIXME -- remove -s option for simulation */
+      rtapi_snprintf(cmd_str, sizeof(cmd_str), "bin/modbus_write -v %f -s", (double) 0.0);
+      rtapi_system(cmd_str, &result);
+      if (RTAPI_OK == result) {
+	stat->value[cmd->id] = cmd->u.on.value;
+	go_status_next(stat, GO_RCS_STATUS_DONE);
+      } else {
+	/* leave status value unchanged */
+	go_status_next(stat, GO_RCS_STATUS_ERROR);
+      }
     }
     go_state_next(stat, GO_RCS_STATE_S0);
   } else {			/* S0 */

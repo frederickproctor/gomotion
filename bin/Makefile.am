@@ -121,8 +121,8 @@ tasksvr_DEPENDENCIES = ../lib/libgo.a
 toolmain_SOURCES = \
 ../src/extintf.h ../src/toolintf.h \
 ../src/toolmain.c
-toolmain_LDADD = ../lib/libgo.a
 toolmain_SOURCES += ../src/ext_sim.c ../src/dcmotor.c ../src/dcmotor.h
+toolmain_LDADD = ../lib/libgo.a
 toolmain_LDADD += @ULAPI_LIBS@ 
 toolmain_DEPENDENCIES = ../lib/libgo.a
 
@@ -269,3 +269,12 @@ go_adapter_SOURCES = ../src/go_adapter.cpp ../src/go_adapter.hpp ../src/trajintf
 go_adapter_LDADD = ../lib/libgo.a @ULAPI_LIBS@ @MTCONNECT_LIBS@
 go_adapter_DEPENDENCIES = ../lib/libgo.a
 endif
+
+bin_PROGRAMS += toolmain_modbus
+toolmain_modbus_SOURCES = \
+../src/extintf.h ../src/toolintf.h \
+../src/toolmain_modbus.c
+toolmain_modbus_SOURCES += ../src/ext_sim.c ../src/dcmotor.c ../src/dcmotor.h
+toolmain_modbus_LDADD = ../lib/libgo.a
+toolmain_modbus_LDADD += @ULAPI_LIBS@ 
+toolmain_modbus_DEPENDENCIES = ../lib/libgo.a
