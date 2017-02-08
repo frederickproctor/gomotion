@@ -37,6 +37,7 @@ bin/taskmain
 bin/tasksvr
 bin/test_smartmotor
 bin/toolmain
+bin/toolmain_modbus
 bin/tracker
 bin/variates
 config.log
