@@ -884,6 +884,10 @@ static go_result clamp_pose(go_pose * pose, const go_pose * min, const go_pose *
   if (pose->tran.z < min->tran.z) pose->tran.z = min->tran.z;
   else if (pose->tran.z > max->tran.z) pose->tran.z = max->tran.z;
 
+  /* FIXME -- the naive algorithm doesn't work due to RPY values going
+   into and out of quaternions not being unique */
+  return GO_RESULT_OK;
+
   retval = go_quat_rpy_convert(&pose->rot, &inrpy);
   if (GO_RESULT_OK != retval) return retval;
   retval = go_quat_rpy_convert(&min->rot, &minrpy);
