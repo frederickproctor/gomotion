@@ -394,15 +394,14 @@ go_result go_quat_rvec_convert(const go_quat *q, go_rvec *r)
   sh = sqrt(go_sq(q->x) + go_sq(q->y) + go_sq(q->z));
 
   if (GO_ROT_SMALL(sh)) {
-    r->x = 0;
-    r->y = 0;
-    r->z = 0;
+    mag = 0;
   } else {
     mag = 2 * atan2(sh, q->s) / sh;
-    r->x = mag * q->x;
-    r->y = mag * q->y;
-    r->z = mag * q->z;
   }
+
+  r->x = mag * q->x;
+  r->y = mag * q->y;
+  r->z = mag * q->z;
 
   return GO_RESULT_OK;
 }
@@ -924,7 +923,8 @@ go_quat go_quat_identity(void)
 {
   go_quat quat;
 
-  quat.s = 1, quat.x = 0, quat.y = 0, quat.z = 0;
+  quat.s = 1;
+  quat.x = 0, quat.y = 0, quat.z = 0;
 
   return quat;
 }
@@ -934,7 +934,8 @@ go_pose go_pose_identity(void)
   go_pose pose;
 
   pose.tran.x = 0, pose.tran.y = 0, pose.tran.z = 0;
-  pose.rot.s = 1, pose.rot.x = 0, pose.rot.y = 0, pose.rot.z = 0;
+  pose.rot.s = 1;
+  pose.rot.x = 0, pose.rot.y = 0, pose.rot.z = 0;
 
   return pose;
 }

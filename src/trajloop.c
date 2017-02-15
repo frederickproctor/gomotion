@@ -162,6 +162,27 @@ static go_real traj_timestamp(void)
 #define CFG_PRINT_3(x,y,z) if (set->debug & DEBUG_CFG) rtapi_print(x, y, z)
 #define CFG_PRINT_4(x,y,z,u) if (set->debug & DEBUG_CFG) rtapi_print(x, y, z, u)
 
+static void shift_joints(go_real *joints, go_real *last, go_integer num, void *kins)
+{
+  go_link link[SERVO_NUM];
+
+  go_kin_get_parameters(kins, link, num);
+
+  while (--num >= 0) {
+    if (GO_QUANTITY_ANGLE != link[num].quantity) {
+      rtapi_print("joint %d not revolute, is %d\n", num, link[num].quantity);
+    }
+    while (joints[num] - last[num] >= GO_PI) {
+      joints[num] -= GO_2_PI;
+      rtapi_print("shifting %d down\n", num);
+    }
+    while (joints[num] - last[num] <= -GO_PI) {
+      joints[num] += GO_2_PI;
+      rtapi_print("shifting %d up\n", num);
+    }
+  }
+}
+
 static void write_servo_cmd(servo_cmd_struct * servo_cmd, go_integer servo_num)
 {
   servo_cmd[servo_num].tail = ++servo_cmd[servo_num].head;
@@ -467,6 +488,8 @@ static void do_cmd_stop(traj_stat_struct * stat, traj_set_struct * set, traj_ref
 	  go_status_next(stat, GO_RCS_STATUS_ERROR);
 	  go_state_next(stat, GO_RCS_STATE_S0);
 	} else {
+	  /* shift joints to nearest revolution */
+	  shift_joints(joints, stat->joints, set->joint_num, kinematics);
 	  for (servo_num = 0; servo_num < set->joint_num; servo_num++) {
 	    stat->joints[servo_num] = joints[servo_num];
 	    servo_cmd[servo_num].type = SERVO_CMD_SERVO_TYPE;
@@ -592,6 +615,8 @@ static void do_cmd_here(traj_cmd_struct * cmd, traj_stat_struct * stat, traj_set
       go_status_next(stat, GO_RCS_STATUS_ERROR);
       go_state_next(stat, GO_RCS_STATE_S0);
     } else {
+      /* shift joints to nearest revolution */
+      shift_joints(joints, stat->joints, set->joint_num, kinematics);
       /* tell all the servos to have a new home position */
       for (servo_num = 0; servo_num < set->joint_num; servo_num++) {
 	servo_cfg[servo_num].type = SERVO_CFG_HOME_TYPE;
@@ -888,6 +913,7 @@ static go_result clamp_pose(go_pose * pose, const go_pose * min, const go_pose *
    into and out of quaternions not being unique */
   return GO_RESULT_OK;
 
+#if 0
   retval = go_quat_rpy_convert(&pose->rot, &inrpy);
   if (GO_RESULT_OK != retval) return retval;
   retval = go_quat_rpy_convert(&min->rot, &minrpy);
@@ -903,6 +929,7 @@ static go_result clamp_pose(go_pose * pose, const go_pose * min, const go_pose *
   else if (inrpy.y > maxrpy.y) inrpy.y = maxrpy.y;
 
   return go_rpy_quat_convert(&inrpy, &pose->rot);
+#endif
 }
 
 static go_result clamp_vel(const go_pose * pose, go_vel * vel, const go_pose * min, const go_pose * max)
@@ -1104,6 +1131,8 @@ static void do_cmd_move_world_or_tool(go_flag world, traj_cmd_struct * cmd, traj
 	go_status_next(stat, GO_RCS_STATUS_ERROR);
 	go_state_next(stat, GO_RCS_STATE_S0);
       } else {
+	/* shift joints to nearest revolution */
+	shift_joints(joints, stat->joints, set->joint_num, kinematics);
 	stat->inpos = go_motion_queue_is_empty(queue);
 	if (stat->inpos) {
 	  go_status_next(stat, GO_RCS_STATUS_DONE);
@@ -1174,6 +1203,8 @@ static void do_cmd_track_world(traj_cmd_struct * cmd, traj_stat_struct * stat, t
       go_status_next(stat, GO_RCS_STATUS_ERROR);
       go_state_next(stat, GO_RCS_STATE_S0);
     } else {
+      /* shift joints to nearest revolution */
+      shift_joints(joints, stat->joints, set->joint_num, kinematics);
       for (servo_num = 0; servo_num < set->joint_num; servo_num++) {
 	stat->joints[servo_num] = joints[servo_num];
 	servo_cmd[servo_num].type = SERVO_CMD_SERVO_TYPE;

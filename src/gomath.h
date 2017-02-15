@@ -400,9 +400,9 @@ typedef struct {
 } go_mat;
 
 /*! A quaternion. \a s is the cosine of the half angle of rotation,
-  and the \a xyz elements comprise the vector that points in the direction
-  of positive rotation and whose magnitude is the sine of the half
-  angle of rotation. */
+  and the \a xyz elements comprise the vector that points in the
+  direction of positive rotation and whose magnitude is the sine of
+  the half angle of rotation. */
 typedef struct {
   go_real s;
   go_real x;
