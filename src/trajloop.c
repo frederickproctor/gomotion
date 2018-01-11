@@ -170,7 +170,7 @@ static void shift_joints(go_real *joints, go_real *last, go_integer num, void *k
 
   while (--num >= 0) {
     if (GO_QUANTITY_ANGLE != link[num].quantity) {
-      rtapi_print("joint %d not revolute, is %d\n", num, link[num].quantity);
+      continue;			/* no need to shift linear joints */
     }
     while (joints[num] - last[num] >= GO_PI) {
       joints[num] -= GO_2_PI;
