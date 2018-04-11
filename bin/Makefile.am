@@ -282,3 +282,8 @@ toolmain_modbus_SOURCES += ../src/ext_sim.c ../src/dcmotor.c ../src/dcmotor.h
 toolmain_modbus_LDADD = ../lib/libgo.a
 toolmain_modbus_LDADD += @ULAPI_LIBS@ 
 toolmain_modbus_DEPENDENCIES = ../lib/libgo.a
+
+bin_PROGRAMS += smartmotor_md
+smartmotor_md_SOURCES = \
+../src/smartmotor_md.c
+smartmotor_md_LDADD = @ULAPI_LIBS@ 
