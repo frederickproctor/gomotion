@@ -15,13 +15,13 @@ int main(int argc, char *argv[])
   go_rpy rpy;
 
   for (num = 0; ;) {
-    double d1, d2, d3, d4;
+    double d1, d2, d3, d4, d5, d6;
     if (NULL == fgets(buffer, sizeof(buffer), stdin)) break;
-    if (4 == sscanf(buffer, "%lf %lf %lf %lf", &d1, &d2, &d3, &d4)) {
+    if (6 == sscanf(buffer, "%lf %lf %lf %lf %lf %lf", &d1, &d2, &d3, &d4, &d5, &d6)) {
       v1 = realloc(v1, (num+1) * sizeof(*v1));
       v2 = realloc(v2, (num+1) * sizeof(*v2));
-      v1[num].x = d1, v1[num].y = d2, v2[num].x = d3, v2[num].y = d4;
-      v1[num].z = v2[num].z = 0;
+      v1[num].x = d1, v1[num].y = d2, v1[num].z = d3,
+	v2[num].x = d4, v2[num].y = d5, v2[num].z = d6;
       num++;
     }
     /* else ignore the line */
