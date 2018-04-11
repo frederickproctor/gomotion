@@ -169,16 +169,10 @@ static void shift_joints(go_real *joints, go_real *last, go_integer num, void *k
   go_kin_get_parameters(kins, link, num);
 
   while (--num >= 0) {
-    if (GO_QUANTITY_ANGLE != link[num].quantity) {
-      rtapi_print("joint %d not revolute, is %d\n", num, link[num].quantity);
-    }
-    while (joints[num] - last[num] >= GO_PI) {
+    if (joints[num] - last[num] >= GO_PI) {
       joints[num] -= GO_2_PI;
-      rtapi_print("shifting %d down\n", num);
-    }
-    while (joints[num] - last[num] <= -GO_PI) {
+    } else if (joints[num] - last[num] <= -GO_PI) {
       joints[num] += GO_2_PI;
-      rtapi_print("shifting %d up\n", num);
     }
   }
 }

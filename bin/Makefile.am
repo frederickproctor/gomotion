@@ -14,7 +14,7 @@ endif
 
 EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_write.py
 
-bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc
+bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc cartfit
 
 if HAVE_TCL_LIB
 bin_PROGRAMS += gotcl
@@ -57,6 +57,10 @@ gokintest_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
 gotestsh_SOURCES = ../src/gotestsh.c
 gotestsh_LDADD = ../lib/libgo.a
 gotestsh_DEPENDENCIES = ../lib/libgo.a
+
+cartfit_SOURCES = ../src/cartfit.c 
+cartfit_LDADD = ../lib/libgo.a
+cartfit_DEPENDENCIES = ../lib/libgo.a
 
 # gomain is Unix only, with gomain_mod its rtlib/ counterpart
 gomain_SOURCES = \

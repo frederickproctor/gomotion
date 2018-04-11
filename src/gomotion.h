@@ -40,7 +40,8 @@ enum {
 
   /* these are used to further specify types of world motion */
   GO_MOTION_LINEAR,
-  GO_MOTION_CIRCULAR
+  GO_MOTION_CIRCULAR,
+  GO_MOTION_WRAPPED /* where rotation is considered a wrapped linear axis */
 };
 
 /*
