@@ -34,6 +34,7 @@ bin/inb
 bin/outb
 bin/rs274ngc
 bin/sixdof
+bin/smartmotor_md
 bin/taskmain
 bin/tasksvr
 bin/test_smartmotor
