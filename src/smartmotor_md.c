@@ -6,15 +6,18 @@
 /*
   Time is in units of servo samples, where 128 samples is 32 ms.
 
-  WHEREWASI - you are sending pos-time pairs in write_code, but still
-  getting the 249 32 0 0 0 response indicating too much data (?)
+  WHEREWASI - the timing looks good now that you are incrementing by
+  the actual 260-261 diff, but when you change the position to even
+  1 more than zero, it jumps.
 */
 
-static unsigned int running;
-static unsigned int slots_available;
-static unsigned int sm_clock;
-static int position;
-static unsigned int sample;
+static unsigned int running = 0;
+static unsigned int slots_available = 0;
+static unsigned int sm_clock = 0;
+static unsigned int sm_diff = 0;
+static int position = 0;
+static unsigned int sample = 0;
+static unsigned int sample_period = 1;
 
 enum {LEAD_SLOTS = 10};		/* how many slots to keep filled */
 
@@ -25,6 +28,7 @@ static void read_code(void *serial)
   int nchars;
   int t;
   unsigned char ival;
+  unsigned int sm_prev;
   
   for (;;) {
     nchars = ulapi_serial_read(serial, buffer, sizeof(buffer)-1);
@@ -43,7 +47,9 @@ static void read_code(void *serial)
 	sm_clock += buffer[3];
 	sm_clock = sm_clock << 8;
 	sm_clock += buffer[4];
-	printf("%u sm_clock, %u sample, %d diff\n", sm_clock, sample, sample - sm_clock);
+	sm_diff = sm_clock - sm_prev;
+	sm_prev = sm_clock;
+	printf("%u sm_clock, %u sample, %d lead, %d diff\n", sm_clock, sample, sample - sm_clock, sm_diff);
       } else {
 	running = 0;
 	printf("not running\n");
@@ -59,7 +65,9 @@ static void read_code(void *serial)
 	sm_clock = buffer[3];
 	sm_clock = sm_clock << 8;
 	sm_clock += buffer[4];
-	printf("%u sm_clock, %u sample, %d diff\n", sm_clock, sample, sample - sm_clock);
+	sm_diff = sm_clock - sm_prev;
+	sm_prev = sm_clock;
+	printf("%u sm_clock, %u sample, %d lead, %d diff\n", sm_clock, sample, sample - sm_clock, sm_diff);
       }
     } else {
       for (t = 0; t < nchars; t++) {
@@ -77,8 +85,8 @@ static void read_code(void *serial)
 static ulapi_mutex_struct mutex;
 
 /* 256 samples = 64 msec */
+enum {DEFAULT_SAMPLE_PERIOD = 256};
 enum {PERIOD_NSECS = 64000000};
-enum {PERIOD_SAMPLES = 256};
 
 /* need to reverse the endian-ness */
 static void sm_copy(unsigned char *dst, unsigned char *src)
@@ -88,6 +96,9 @@ static void sm_copy(unsigned char *dst, unsigned char *src)
   dst[1] = sptr[2];
   dst[2] = sptr[1];
   dst[3] = sptr[0];
+  #if 0
+  printf("%X %X %X %X\n", (unsigned int) dst[0], (unsigned int) dst[1], (unsigned int) dst[2], (unsigned int) dst[3]);
+  #endif
 }
 
 static void write_code(void *serial)
@@ -105,13 +116,15 @@ static void write_code(void *serial)
 
   position = 0;
   sample = 0;
+  sample_period = DEFAULT_SAMPLE_PERIOD;
 
   for (t = 0; t < LEAD_SLOTS; t++) {
     ulapi_serial_write(serial, "Q\r", 2);
+    position += 40;
     sm_copy(&position_buffer[1], &position);
     ulapi_serial_write(serial, position_buffer, sizeof(position_buffer));
     sm_copy(&time_buffer[1], &sample);
-    sample += PERIOD_SAMPLES;
+    sample += sample_period;
     ulapi_serial_write(serial, time_buffer, sizeof(time_buffer));
     ulapi_wait(PERIOD_NSECS);
   }
@@ -125,10 +138,11 @@ static void write_code(void *serial)
   for (;;) {
     ulapi_mutex_take(&mutex);
     ulapi_serial_write(serial, "Q\r", 2);
-    printf(">>> %d\n", position);
+    position += 40;
     sm_copy(&position_buffer[1], &position);
     ulapi_serial_write(serial, position_buffer, sizeof(position_buffer));
-    sample = sm_clock + (LEAD_SLOTS * PERIOD_SAMPLES);
+    if (sm_diff > 0) sample += sm_diff;
+    else sample += sample_period;
     sm_copy(&time_buffer[1], &sample);
     ulapi_serial_write(serial, time_buffer, sizeof(time_buffer));
     ulapi_mutex_give(&mutex);
