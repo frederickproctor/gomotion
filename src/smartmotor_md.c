@@ -10,6 +10,7 @@
   getting the 249 32 0 0 0 response indicating too much data (?)
 */
 
+static unsigned int running;
 static unsigned int slots_available;
 static unsigned int sm_clock;
 static int position;
@@ -33,6 +34,7 @@ static void read_code(void *serial)
     if (0xF9 == buffer[0]) {
       /* status message */
       if (0x80 & buffer[1]) {
+	running = 1;
 	printf("running\n");
 	slots_available = 0x7F & buffer[1];
 	printf("%d slots available\n", slots_available);
@@ -43,6 +45,7 @@ static void read_code(void *serial)
 	sm_clock += buffer[4];
 	printf("%u sm_clock, %u sample, %d diff\n", sm_clock, sample, sample - sm_clock);
       } else {
+	running = 0;
 	printf("not running\n");
 	if (0x40 & buffer[1]) printf("underflow\n");
 	if (0x20 & buffer[1]) printf("overflow\n");
@@ -89,33 +92,37 @@ static void sm_copy(unsigned char *dst, unsigned char *src)
 
 static void write_code(void *serial)
 {
-  char command_buffer[] = "A=100 V=10000 MD\r";
+  enum {COMMAND_LEN = 80};
+  char command_buffer[COMMAND_LEN];
   unsigned char position_buffer[] = {250, 0, 0, 0, 0, 13};
   unsigned char time_buffer[] = {251, 0, 0, 0, 0, 13};
   unsigned int t;
 
   ulapi_mutex_take(&mutex);
 
+  strcpy(command_buffer, "A=100 V=10000 MD\r");
   ulapi_serial_write(serial, command_buffer, strlen(command_buffer));
 
   position = 0;
   sample = 0;
 
   for (t = 0; t < LEAD_SLOTS; t++) {
+    ulapi_serial_write(serial, "Q\r", 2);
     sm_copy(&position_buffer[1], &position);
     ulapi_serial_write(serial, position_buffer, sizeof(position_buffer));
     sm_copy(&time_buffer[1], &sample);
     sample += PERIOD_SAMPLES;
     ulapi_serial_write(serial, time_buffer, sizeof(time_buffer));
+    ulapi_wait(PERIOD_NSECS);
   }
 
   strcpy(command_buffer, "G\r");
   ulapi_serial_write(serial, command_buffer, strlen(command_buffer));
+  ulapi_wait(PERIOD_NSECS);
 
   ulapi_mutex_give(&mutex);
 
   for (;;) {
-#if 1
     ulapi_mutex_take(&mutex);
     ulapi_serial_write(serial, "Q\r", 2);
     printf(">>> %d\n", position);
@@ -125,7 +132,6 @@ static void write_code(void *serial)
     sm_copy(&time_buffer[1], &sample);
     ulapi_serial_write(serial, time_buffer, sizeof(time_buffer));
     ulapi_mutex_give(&mutex);
-#endif
     ulapi_wait(PERIOD_NSECS);
   }
 
