@@ -2018,7 +2018,7 @@ go_result go_tridiag_ql(go_real *d,
   coordinate systems, what is the least-squares best fit transform
   from one coordinate system to the other?
 
-  See Berthold K. P. Horn, "Close-form solution of absolute
+  See Berthold K. P. Horn, "Closed-form solution of absolute
   orientation using unit quaternions," Journal of the Optical Society
   of America A, Vol. 4, page 629, April 1987.
 */
