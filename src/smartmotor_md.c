@@ -11,12 +11,14 @@
   1 more than zero, it jumps.
 */
 
+static ulapi_mutex_struct mutex;
+
 static unsigned int running = 0;
 static unsigned int slots_available = 0;
 static unsigned int sm_clock = 0;
 static unsigned int sm_diff = 0;
-static int position = 0;
-static unsigned int sample = 0;
+static int position_value = 0;
+static unsigned int time_value = 0;
 static unsigned int sample_period = 1;
 
 enum {LEAD_SLOTS = 10};		/* how many slots to keep filled */
@@ -49,7 +51,7 @@ static void read_code(void *serial)
 	sm_clock += buffer[4];
 	sm_diff = sm_clock - sm_prev;
 	sm_prev = sm_clock;
-	printf("%u sm_clock, %u sample, %d lead, %d diff\n", sm_clock, sample, sample - sm_clock, sm_diff);
+	printf("%u sm_clock, %u time val, %d lead, %d diff\n", sm_clock, time_value, time_value - sm_clock, sm_diff);
       } else {
 	running = 0;
 	printf("not running\n");
@@ -67,7 +69,7 @@ static void read_code(void *serial)
 	sm_clock += buffer[4];
 	sm_diff = sm_clock - sm_prev;
 	sm_prev = sm_clock;
-	printf("%u sm_clock, %u sample, %d lead, %d diff\n", sm_clock, sample, sample - sm_clock, sm_diff);
+	printf("%u sm_clock, %u time val, %d lead, %d diff\n", sm_clock, time_value, time_value - sm_clock, sm_diff);
       }
     } else {
       for (t = 0; t < nchars; t++) {
@@ -81,8 +83,6 @@ static void read_code(void *serial)
 
   return;
 }
-
-static ulapi_mutex_struct mutex;
 
 /* 256 samples = 64 msec */
 enum {DEFAULT_SAMPLE_PERIOD = 256};
@@ -114,17 +114,17 @@ static void write_code(void *serial)
   strcpy(command_buffer, "A=100 V=10000 MD\r");
   ulapi_serial_write(serial, command_buffer, strlen(command_buffer));
 
-  position = 0;
-  sample = 0;
+  position_value = 0;
+  time_value = 0;
   sample_period = DEFAULT_SAMPLE_PERIOD;
 
   for (t = 0; t < LEAD_SLOTS; t++) {
     ulapi_serial_write(serial, "Q\r", 2);
-    position += 40;
-    sm_copy(&position_buffer[1], &position);
+    position_value += 40;
+    sm_copy(&position_buffer[1], &position_value);
     ulapi_serial_write(serial, position_buffer, sizeof(position_buffer));
-    sm_copy(&time_buffer[1], &sample);
-    sample += sample_period;
+    sm_copy(&time_buffer[1], &time_value);
+    time_value += sample_period;
     ulapi_serial_write(serial, time_buffer, sizeof(time_buffer));
     ulapi_wait(PERIOD_NSECS);
   }
@@ -138,12 +138,12 @@ static void write_code(void *serial)
   for (;;) {
     ulapi_mutex_take(&mutex);
     ulapi_serial_write(serial, "Q\r", 2);
-    position += 40;
-    sm_copy(&position_buffer[1], &position);
+    position_value += 40;
+    sm_copy(&position_buffer[1], &position_value);
     ulapi_serial_write(serial, position_buffer, sizeof(position_buffer));
-    if (sm_diff > 0) sample += sm_diff;
-    else sample += sample_period;
-    sm_copy(&time_buffer[1], &sample);
+    if (sm_diff > 0) time_value += sm_diff;
+    else time_value += sample_period;
+    sm_copy(&time_buffer[1], &time_value);
     ulapi_serial_write(serial, time_buffer, sizeof(time_buffer));
     ulapi_mutex_give(&mutex);
     ulapi_wait(PERIOD_NSECS);
@@ -209,7 +209,9 @@ int main(int argc, char * argv[])
     fflush(stdout);
     if (NULL == fgets(buffer, BUFFERLEN, stdin)) break;
     if (1 == ulapi_sscanf(buffer, "%d", &i1)) {
-      position = i1;
+      ulapi_mutex_take(&mutex);
+      position_value = i1;
+      ulapi_mutex_give(&mutex);
     }
   }
 

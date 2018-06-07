@@ -19,6 +19,14 @@ extern "C" {
 
 #define FANUC_LRMATE200ID_KIN_NUM_JOINTS 6
 
+#define FANUC_LRMATE200ID_KIN_A1 0.050
+#define FANUC_LRMATE200ID_KIN_A2 0.330
+#define FANUC_LRMATE200ID_KIN_A3 0.035
+#define FANUC_LRMATE200ID_KIN_D2 0.000
+#define FANUC_LRMATE200ID_KIN_D3 0.000
+#define FANUC_LRMATE200ID_KIN_D4 0.335
+#define FANUC_LRMATE200ID_KIN_IFLAGS 0
+
 typedef struct {
   three21_kin_struct tk;
   go_pose t7;			/* final tool transform */

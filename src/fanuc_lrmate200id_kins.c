@@ -29,6 +29,16 @@ go_result fanuc_lrmate200id_kin_init(fanuc_lrmate200id_kin_struct *kins)
 {
   go_result result;
 
+  /* set the defaults so no INI file handling is necessary */
+  kins->tk.a1 = FANUC_LRMATE200ID_KIN_A1;
+  kins->tk.a2 = FANUC_LRMATE200ID_KIN_A2;
+  kins->tk.a3 = FANUC_LRMATE200ID_KIN_A3;
+  kins->tk.d2 = FANUC_LRMATE200ID_KIN_D2;
+  kins->tk.d3 = FANUC_LRMATE200ID_KIN_D3;
+  kins->tk.d4 = FANUC_LRMATE200ID_KIN_D4;
+  kins->tk.iflags = FANUC_LRMATE200ID_KIN_IFLAGS;
+
+  /* set the starting position to be the usual home position */
   kins->t7.tran.x = 0;
   kins->t7.tran.y = 0;
   kins->t7.tran.z = WRIST_OFFSET;
@@ -59,13 +69,13 @@ go_result fanuc_lrmate200id_kin_set_parameters(fanuc_lrmate200id_kin_struct *kin
 
   if (GO_RESULT_OK != three21_kin_set_parameters(&kins->tk, params, 6)) {
     /* force them to be what the Fanuc is */
-    kins->tk.a1 = 0.050;
-    kins->tk.a2 = 0.330;
-    kins->tk.a3 = 0.035;
-    kins->tk.d2 = 0;
-    kins->tk.d3 = 0;
-    kins->tk.d4 = 0.335;
-    kins->tk.iflags = 0;
+    kins->tk.a1 = FANUC_LRMATE200ID_KIN_A1;
+    kins->tk.a2 = FANUC_LRMATE200ID_KIN_A2;
+    kins->tk.a3 = FANUC_LRMATE200ID_KIN_A3;
+    kins->tk.d2 = FANUC_LRMATE200ID_KIN_D2;
+    kins->tk.d3 = FANUC_LRMATE200ID_KIN_D3;
+    kins->tk.d4 = FANUC_LRMATE200ID_KIN_D4;
+    kins->tk.iflags = FANUC_LRMATE200ID_KIN_IFLAGS;
   }
 
   return GO_RESULT_OK;
