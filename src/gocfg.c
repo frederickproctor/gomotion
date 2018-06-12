@@ -211,7 +211,7 @@ static void dbprintf(int prefix, const char * fmt, ...)
 
    opterr = 0;
    while (1) {
-     option = ulapi_getopt(argc, argv, ":i:u:s:c:d");
+     option = ulapi_getopt(argc, argv, ":i:t:d");
      if (option == -1)
        break;
 

@@ -12,9 +12,9 @@ if HAVE_SDL
 AM_CPPFLAGS += @SDL_CFLAGS@
 endif
 
-EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_write.py
+EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_read modbus_write
 
-bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc cartfit
+bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc cartfit rpy2quat quat2rpy
 
 if HAVE_TCL_LIB
 bin_PROGRAMS += gotcl
@@ -28,7 +28,7 @@ gorun_SOURCES = ../src/gorun.c
 gorun_LDADD = ../lib/libgo.a @ULAPI_LIBS@ 
 gorun_DEPENDENCIES = ../lib/libgo.a
 
-bin_SCRIPTS = gorun.sh checkgo killgo pendant.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup
+bin_SCRIPTS = gorun.sh checkgo killgo pendant.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_read modbus_write
 
 goscratchtest_SOURCES = ../src/goscratchtest.c 
 goscratchtest_LDADD = ../lib/libgokin.a ../lib/libgo.a
@@ -61,6 +61,14 @@ gotestsh_DEPENDENCIES = ../lib/libgo.a
 cartfit_SOURCES = ../src/cartfit.c 
 cartfit_LDADD = ../lib/libgo.a
 cartfit_DEPENDENCIES = ../lib/libgo.a
+
+rpy2quat_SOURCES = ../src/rpy2quat.c 
+rpy2quat_LDADD = ../lib/libgo.a @ULAPI_LIBS@
+rpy2quat_DEPENDENCIES = ../lib/libgo.a
+
+quat2rpy_SOURCES = ../src/quat2rpy.c
+quat2rpy_LDADD = ../lib/libgo.a @ULAPI_LIBS@
+quat2rpy_DEPENDENCIES = ../lib/libgo.a
 
 # gomain is Unix only, with gomain_mod its rtlib/ counterpart
 gomain_SOURCES = \
