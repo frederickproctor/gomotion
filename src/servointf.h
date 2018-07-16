@@ -12,7 +12,6 @@
 #ifndef SERVOINTF_H
 #define SERVOINTF_H
 
-#include <rtapi.h>		/* rtapi_id */
 #include "go.h"			/* GO_MOTION_JOINT_NUM */
 #include "gorcs.h"		/* GO_RCS_CMD,STAT_MSG */
 #include "pid.h"		/* PidStruct */

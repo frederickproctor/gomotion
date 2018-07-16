@@ -60,6 +60,7 @@ lib/.deps/
 lib/Makefile
 lib/Makefile.in
 lib/*.a
+rtaidir
 src/.deps
 src/.dirstamp
 src/Makefile
