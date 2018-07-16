@@ -25,9 +25,12 @@ static enum {USE_UNIX, USE_RTAI} which_ulapi = USE_UNIX;
 #define DEFAULT_GOMAIN "gomain"
 #define DEFAULT_TOOLMAIN "toolmain"
 
+#define DEFAULT_PENDANT_NAME "pendant.tcl"
+
 static int ini_load(char *inifile_name,
 		    char *gomain,
 		    char ext_init_string[INIFILE_MAX_LINELEN],
+		    char pendant_string[INIFILE_MAX_LINELEN],
 		    int *rtapi_hal_nsecs_per_period,
 		    int *go_stepper_type,
 		    int *go_stepper_shm_key,
@@ -79,6 +82,17 @@ static int ini_load(char *inifile_name,
   } else {
     strncpy(ext_init_string, inistring, INIFILE_MAX_LINELEN);
     ext_init_string[INIFILE_MAX_LINELEN-1] = 0;
+  }
+
+  key = "PENDANT";
+  inistring = ini_find(fp, key, section);
+  if (NULL == inistring) {
+    /* optional, make it the default */
+    strncpy(pendant_string, DEFAULT_PENDANT_NAME, INIFILE_MAX_LINELEN);
+    pendant_string[INIFILE_MAX_LINELEN-1] = 0;
+  } else {
+    strncpy(pendant_string, inistring, INIFILE_MAX_LINELEN);
+    pendant_string[INIFILE_MAX_LINELEN-1] = 0;
   }
 
   section = "RTAPI_HAL";
@@ -306,6 +320,7 @@ int main(int argc, char *argv[])
   char gomain[INIFILE_MAX_LINELEN] = DEFAULT_GOMAIN;
   char toolmain[INIFILE_MAX_LINELEN] = DEFAULT_TOOLMAIN;
   char ext_init_string[INIFILE_MAX_LINELEN];
+  char pendant_string[INIFILE_MAX_LINELEN];
   int rtapi_hal_nsecs_per_period = 0;
   int go_stepper_type = 0;
   int go_stepper_shm_key = 0;
@@ -397,6 +412,7 @@ int main(int argc, char *argv[])
   if (0 != ini_load(inifile_name,
 		    gomain,
 		    ext_init_string,
+		    pendant_string,
 		    &rtapi_hal_nsecs_per_period,
 		    &go_stepper_type,
 		    &go_stepper_shm_key,
@@ -688,7 +704,7 @@ int main(int argc, char *argv[])
       result = ulapi_snprintf(path, sizeof(path)-1,
 			      "%s%s%s %s%s%s -- -i %s %s",
 			      dirname, ulapi_pathsep, "gotk",
-			      dirname, ulapi_pathsep, "pendant.tcl",
+			      dirname, ulapi_pathsep, pendant_string,
 			      inifile_name,
 			      ularg);
     }
