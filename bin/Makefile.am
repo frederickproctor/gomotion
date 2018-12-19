@@ -180,15 +180,6 @@ endif
 gotestmmavg_SOURCES = ../src/gotestmmavg.c
 gotestmmavg_LDADD = ../lib/libgo.a @ULAPI_LIBS@  
 
-# Extras if we have IO ports
-if HAVE_IOPORTS
-bin_PROGRAMS += inb outb
-inb_SOURCES = ../src/inb.c
-inb_CFLAGS = -O2
-outb_SOURCES = ../src/outb.c
-outb_CFLAGS = -O2
-endif
-
 # stuff for Sensoray S626
 
 if HAVE_S626
