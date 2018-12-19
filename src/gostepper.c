@@ -392,17 +392,41 @@ static void graycode_loop(void * arg)
   } /* while (1) */
 }
 
+void rtapi_app_exit(void)
+{
+  int count = gss_ptr->heartbeat;
+  
+  if (NULL != stepper_task) {
+    if (DEBUG) rtapi_print("gostepper: %d unused stepper stack bytes\n",
+		rtapi_task_stack_check(stepper_task));
+    (void) rtapi_task_stop(stepper_task);
+    (void) rtapi_task_delete(stepper_task);
+    stepper_task = 0;
+  }
+
+  if (NULL != gss_shm) {
+    rtapi_rtm_delete(gss_shm);
+    gss_shm = NULL;
+  }
+
+  if (DEBUG) rtapi_print("gostepper: gostepper done, count = %d\n", count);
+  return;
+}
+
 int rtapi_app_main(RTAPI_APP_ARGS_DECL)
 {
   void (*stepper_loop)(void * arg);
   void * stepper_arg;
   int stepper_prio;
+  rtapi_integer nsecs_per_period;
   rtapi_integer nsecs_per_task_cycle;
 
   if (0 != rtapi_app_init(RTAPI_APP_ARGS)) {
     rtapi_print("gostepper: can't init rtapi\n");
     return -1;
   }
+
+  rtapi_app_atexit(rtapi_app_exit);
 
   /* get command line args */
   (void) rtapi_arg_get_int(&DEBUG, "DEBUG");
@@ -411,6 +435,9 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   if (DEBUG) rtapi_print("gostepper: using GO_STEPPER_SHM_KEY = %d\n", GO_STEPPER_SHM_KEY);
   (void) rtapi_arg_get_int(&GO_STEPPER_TYPE, "GO_STEPPER_TYPE");
   if (DEBUG) rtapi_print("gostepper: using GO_STEPPER_TYPE = %d\n", GO_STEPPER_TYPE);
+  (void) rtapi_arg_get_int(&nsecs_per_period, "NSECS_PER_PERIOD");
+  if (0 < nsecs_per_period) rtapi_clock_set_period(nsecs_per_period);
+  if (DEBUG) rtapi_print("gostepper: using period = %d\n", rtapi_clock_period);
 
   /* allocate the shared memory buffer */
   gss_shm = rtapi_rtm_new(GO_STEPPER_SHM_KEY, sizeof(go_stepper_struct));
@@ -472,23 +499,4 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   rtapi_print("gostepper: gostepper started with period %d nsec\n", nsecs_per_task_cycle);
 
   return rtapi_app_wait();
-}
-
-void rtapi_app_exit(void)
-{
-  if (NULL != stepper_task) {
-    if (DEBUG) rtapi_print("gostepper: %d unused stepper stack bytes\n",
-		rtapi_task_stack_check(stepper_task));
-    (void) rtapi_task_stop(stepper_task);
-    (void) rtapi_task_delete(stepper_task);
-    stepper_task = 0;
-  }
-
-  if (NULL != gss_shm) {
-    rtapi_rtm_delete(gss_shm);
-    gss_shm = NULL;
-  }
-
-  if (DEBUG) rtapi_print("gostepper: gostepper done\n");
-  return;
 }
