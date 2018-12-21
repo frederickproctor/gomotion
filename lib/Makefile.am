@@ -1,3 +1,5 @@
+AM_CPPFLAGS = -I../src -I@ULAPI_DIR@/include
+
 lib_LIBRARIES = libgo.a libgokin.a
 
 libgo_a_SOURCES = ../src/go.c ../src/gotypes.c ../src/gomath.c ../src/goutil.c ../src/gotraj.c ../src/gomotion.c ../src/gointerp.c ../src/golog.c ../src/goprint.c ../src/variates.c ../src/variates.h

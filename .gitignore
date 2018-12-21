@@ -32,6 +32,8 @@ bin/igpsclient
 bin/igpsserver
 bin/inb
 bin/outb
+bin/quat2rpy
+bin/rpy2quat
 bin/rs274ngc
 bin/sixdof
 bin/smartmotor_md
