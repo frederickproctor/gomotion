@@ -269,6 +269,38 @@ dnl put RTAI_DIR into variable file for use by shell scripts
     [AM_CONDITIONAL(HAVE_RTAI, test x$rtai_dir != x)]
 )
 
+AC_DEFUN([ACX_XENOMAI],
+    [AC_MSG_CHECKING([for Xenomai])]
+    [AC_ARG_WITH(xenomai,
+	    [  --with-xenomaii=<path to Xenomai>  Specify path to Xenomai],
+	    dirs=$withval,dirs="/usr/xenomai")]
+    for dir in $dirs ; do
+	if test -f $dir/include/xenomai/init.h ; then xenomai_dir=$dir ; break; fi
+    done
+    if test x$xenomai_dir = x ; then
+	[AC_MSG_RESULT([no])]
+	[AC_MSG_WARN([not found in $dirs, try --with-xenomai=<path to Xenomai>])]
+	\rm -f xenomaidir
+	XENOMAI_CFLAGS=""
+	XENOMAI_LDFLAGS=""
+    else
+	XENOMAI_DIR=$xenomai_dir
+	XENOMAI_CFLAGS="`xeno-config --skin=alchemy --cflags`"
+	XENOMAI_LDFLAGS="`xeno-config --skin=alchemy --ldflags`"
+dnl put HAVE_XENOMAI in config.h
+	[AC_DEFINE(HAVE_XENOMAI,
+		1, [Define non-zero if you have XENOMAI.])]
+dnl put XENOMAI_DIR and linking flags in Makefile
+	[AC_SUBST(XENOMAI_DIR)]
+	[AC_SUBST(XENOMAI_CFLAGS)]
+	[AC_SUBST(XENOMAI_LDFLAGS)]
+	[AC_MSG_RESULT([$XENOMAI_DIR])]
+dnl put XENOMAI_DIR into variable file for use by shell scripts
+	echo XENOMAI_DIR=$xenomai_dir > xenomaidir
+    fi
+    [AM_CONDITIONAL(HAVE_XENOMAI, test x$xenomai_dir != x)]
+)
+
 AC_DEFUN([ACX_DL],
 dnl put HAVE_DLFCN_H in config/config.h
 	[AC_CHECK_HEADERS([dlfcn.h])]
@@ -305,12 +337,31 @@ dnl put NEED_GETOPT in config.h
 	fi
 )
 
+AC_DEFUN([ACX_HAVE_IOPL],
+	[AC_MSG_CHECKING([for iopl])]
+	[AC_TRY_LINK([#include <sys/io.h>],
+		[int val=iopl(0);],
+		have_iopl=yes)]
+	if test x$have_iopl = xyes ; then
+	[AC_MSG_RESULT([yes])]
+dnl put HAVE_IOPL in config.h
+	[AC_DEFINE(HAVE_IOPL,
+		1, [Define non-zero if you have iopl.])]
+	else
+	[AC_MSG_RESULT([no])]
+	fi
+	[AM_CONDITIONAL(HAVE_IOPL, test xhave_iopl = xyes	)]
+)
+
 AC_DEFUN([ACX_PRE_ULAPI],
 	[ACX_PTHREAD]
 	[ACX_RTAI]
+	[ACX_XENOMAI]
 	[ACX_DL]
 	[ACX_TIME]
 	[ACX_GETOPT]
+	[ACX_HAVE_IOPORTS]
+	[ACX_HAVE_IOPL]
 )
 
 AC_DEFUN([ACX_ULAPI],
@@ -340,4 +391,21 @@ dnl put ULAPI_DIR into variable file for use by shell scripts
 	echo ULAPI_DIR=$ULAPI_DIR > ulapi_dir
 dnl enable HAVE_ULAPI test in Makefile
 	[AM_CONDITIONAL(HAVE_ULAPI, test x$ULAPI_DIR != x)]
+)
+
+AC_DEFUN([ACX_HAVE_IOPORTS],
+	[AC_MSG_CHECKING([for inb/outb])]
+	[AC_TRY_LINK([#include <sys/io.h>],
+		[int in=inb(0x80);],
+		have_ioports=yes)]
+	if test x$have_ioports = xyes ; then
+	[AC_MSG_RESULT([yes])]
+dnl put HAVE_IOPORTS in config.h
+	[AC_DEFINE(HAVE_IOPORTS,
+		1, [Define non-zero if you have inb/outb.])]
+	else
+	[AC_MSG_RESULT([no])]
+	fi
+dnl enable check for HAVE_IOPORTS in Makefile.am
+	[AM_CONDITIONAL(HAVE_IOPORTS, test x$have_ioports = xyes)]
 )

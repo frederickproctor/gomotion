@@ -1,4 +1,33 @@
+
 AM_CPPFLAGS = -I../src -I@ULAPI_DIR@/include
+
+if HAVE_XENOMAI
+
+bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gosh
+
+gomathtest_SOURCES = ../src/gomathtest.c 
+gomathtest_LDADD = -L../lib -lgo
+gomathtest_DEPENDENCIES = ../lib/libgo.a
+
+gostepper_SOURCES = ../src/gostepper.c ../src/gostepper.h
+gostepper_LDADD = -L../lib -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
+gostepper_DEPENDENCIES = ../lib/libgo.a
+
+gosteppercfg_SOURCES = ../src/gosteppercfg.c 
+gosteppercfg_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+gosteppercfg_DEPENDENCIES = ../lib/libgo.a
+
+gomain_SOURCES = ../src/extintf.h ../src/pid.c ../src/pid.h ../src/servoloop.c ../src/servointf.h ../src/trajloop.c ../src/trajintf.h ../src/gomain.c ../src/ext_sim.c ../src/dcmotor.c ../src/dcmotor.h
+gomain_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
+gomain_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
+
+gosh_SOURCES = ../src/gosh.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gosh_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+gosh_DEPENDENCIES = ../lib/libgo.a
+
+else
+
+### normal Unix
 
 if HAVE_TCL_INCLUDE
 AM_CPPFLAGS += -I@TCL_INCLUDE_DIR@
@@ -286,3 +315,7 @@ bin_PROGRAMS += smartmotor_md
 smartmotor_md_SOURCES = \
 ../src/smartmotor_md.c
 smartmotor_md_LDADD = @ULAPI_LIBS@ 
+
+### normal Unix
+
+endif
