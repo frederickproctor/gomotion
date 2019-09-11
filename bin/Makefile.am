@@ -18,7 +18,7 @@ gosteppercfg_SOURCES = ../src/gosteppercfg.c
 gosteppercfg_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
 gosteppercfg_DEPENDENCIES = ../lib/libgo.a
 
-gomain_SOURCES = ../src/extintf.h ../src/pid.c ../src/pid.h ../src/servoloop.c ../src/servointf.h ../src/trajloop.c ../src/trajintf.h ../src/gomain.c ../src/ext_sim.c ../src/dcmotor.c ../src/dcmotor.h
+gomain_SOURCES = ../src/extintf.h ../src/pid.c ../src/pid.h ../src/servoloop.c ../src/servointf.h ../src/trajloop.c ../src/trajintf.h ../src/gomain.c ../src/ext_stepper.c
 gomain_CFLAGS = -DTARGET_XENOMAI
 gomain_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
 gomain_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
