@@ -10,6 +10,7 @@ gomathtest_LDADD = -L../lib -lgo
 gomathtest_DEPENDENCIES = ../lib/libgo.a
 
 gostepper_SOURCES = ../src/gostepper.c ../src/gostepper.h
+gostepper_CFLAGS = -DTARGET_XENOMAI
 gostepper_LDADD = -L../lib -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
 gostepper_DEPENDENCIES = ../lib/libgo.a
 
@@ -18,6 +19,7 @@ gosteppercfg_LDADD = -L../lib -lgo @ULAPI_LIBS@
 gosteppercfg_DEPENDENCIES = ../lib/libgo.a
 
 gomain_SOURCES = ../src/extintf.h ../src/pid.c ../src/pid.h ../src/servoloop.c ../src/servointf.h ../src/trajloop.c ../src/trajintf.h ../src/gomain.c ../src/ext_sim.c ../src/dcmotor.c ../src/dcmotor.h
+gomain_CFLAGS = -DTARGET_XENOMAI
 gomain_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
 gomain_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
 
@@ -28,6 +30,8 @@ gosh_DEPENDENCIES = ../lib/libgo.a
 else
 
 ### normal Unix
+
+AM_CPPFLAGS += -DTARGET_UNIX
 
 if HAVE_TCL_INCLUDE
 AM_CPPFLAGS += -I@TCL_INCLUDE_DIR@
