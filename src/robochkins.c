@@ -13,7 +13,7 @@
 #include <math.h>		/* sqrt */
 #include "gotypes.h"		/* go_result, go_integer */
 #include "gomath.h"		/* go_pose */
-#include "roboch.h"		/* these decls */
+#include "robochkins.h"		/* these decls */
 
 /* despite these defs, the values are assumed to be 7 and 6 and can't
    simply be changed here */

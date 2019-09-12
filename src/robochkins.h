@@ -9,8 +9,8 @@
   See NIST Administration Manual 4.09.07 b and Appendix I. 
 */
 
-#ifndef ROBOCH_H
-#define ROBOCH_H
+#ifndef ROBOCHKINS_H
+#define ROBOCHKINS_H
 
 #include "gotypes.h"		/* go_result, go_integer */
 #include "gomath.h"		/* go_pose */
@@ -156,4 +156,4 @@ extern go_result roboch_kin_jac_fwd(void * kins,
 }
 #endif
 
-#endif /* ROBOCH_H */
+#endif /* ROBOCHKINS_H */
