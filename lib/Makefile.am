@@ -15,4 +15,6 @@ libgokin_a_SOURCES = \
 ../src/scarakins.c ../src/scarakins.h \
 ../src/tripointkins.c ../src/tripointkins.h \
 ../src/spheristkins.c ../src/spheristkins.h \
-../src/three21kins.c ../src/three21kins.h
+../src/three21kins.c ../src/three21kins.h \
+../src/roboch.c ../src/roboch.h
+

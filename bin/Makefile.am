@@ -3,7 +3,7 @@ AM_CPPFLAGS = -I../src -I@ULAPI_DIR@/include
 
 if HAVE_XENOMAI
 
-bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gosh
+bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gocfg gosh
 
 gomathtest_SOURCES = ../src/gomathtest.c 
 gomathtest_LDADD = -L../lib -lgo
@@ -23,16 +23,37 @@ gomain_CFLAGS = -DTARGET_XENOMAI
 gomain_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
 gomain_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
 
+gocfg_SOURCES = ../src/gocfg.c ../src/pid.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gocfg_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+gocfg_DEPENDENCIES = ../lib/libgo.a
+
 gosh_SOURCES = ../src/gosh.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
 gosh_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
 gosh_DEPENDENCIES = ../lib/libgo.a
+
+if HAVE_TCL_LIB
+AM_CPPFLAGS += -I@TCL_INCLUDE_DIR@
+bin_PROGRAMS += gotcl
+gotcl_SOURCES = ../src/gotcl.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotcl_LDADD = -L../lib -lgo @TCL_LINK@ @ULAPI_LIBS@ 
+gotcl_DEPENDENCIES = ../lib/libgo.a
+endif
+
+if HAVE_TK_LIB
+AM_CPPFLAGS += -I@TK_INCLUDE_DIR@
+bin_PROGRAMS += gotk
+gotk_SOURCES = ../src/gotk.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotk_CFLAGS = @X_CFLAGS@
+gotk_LDADD = -L../lib -lgo @TCL_LINK@ @TK_LINK@ @X_PRE_LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @ULAPI_LIBS@ 
+gotk_DEPENDENCIES = ../lib/libgo.a
+endif
 
 else
 
 ### normal Unix
 
 AM_CPPFLAGS += -DTARGET_UNIX
-
+ 
 if HAVE_TCL_INCLUDE
 AM_CPPFLAGS += -I@TCL_INCLUDE_DIR@
 endif
