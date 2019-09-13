@@ -75,12 +75,18 @@ static char * btostr(char b, char * str)
   in this case 10,000 Hz.
 */
 
-static void stepdir_loop(void * arg)
+typedef struct {
+  rtapi_integer type;
+  rtapi_integer nsecs_per_period;
+} stepper_loop_args;
+
+static void stepdir_loop(void * args)
 {
+  rtapi_integer type;
+  rtapi_integer nsecs_per_period;
   rtapi_integer step_bit;
   rtapi_integer dir_bit;
-  rtapi_integer nsecs_per_task_cycle;
-  rtapi_integer task_cycles_per_sec;
+  rtapi_integer periods_per_sec;
   rtapi_integer joint = 0;
   rtapi_integer up_count[GO_STEPPER_NUM];
   rtapi_integer down_count[GO_STEPPER_NUM];
@@ -95,8 +101,11 @@ static void stepdir_loop(void * arg)
 #ifdef PRINT_STR
   char loStr[9], hiStr[9];
 #endif
- 
-  if (arg == (void *) 0) {
+
+  type = ((stepper_loop_args *) args)->type;
+  nsecs_per_period = ((stepper_loop_args *) args)->nsecs_per_period;
+  
+  if (GO_STEPPER_DIRSTEP == type) {
     /* for dir-step */
     dir_bit = 1;
     step_bit = 2;
@@ -118,9 +127,8 @@ static void stepdir_loop(void * arg)
     old_dir[joint] = 0;
   }
 
-  nsecs_per_task_cycle = rtapi_clock_period;
-  /* task_cycles_per_sec is 'h' per description above */
-  task_cycles_per_sec = 1000000000 / nsecs_per_task_cycle;
+  /* periods_per_sec is 'h' per description above */
+  periods_per_sec = 1000000000 / nsecs_per_period;
   /* gss_ptr->freq[] is 'f' per description above */
 
   rtapi_print("gostepper: starting gostepper loop\n");
@@ -130,10 +138,10 @@ static void stepdir_loop(void * arg)
       /* compute maximum counts for full period, 'h/f' */
       if (gss_ptr->freq[joint] > 0) {
 	dir = 1;
-	max_count = task_cycles_per_sec / (+gss_ptr->freq[joint]);
+	max_count = periods_per_sec / (+gss_ptr->freq[joint]);
       } else if (gss_ptr->freq[joint] < 0) {
 	dir = 0;
-	max_count = task_cycles_per_sec / (-gss_ptr->freq[joint]);
+	max_count = periods_per_sec / (-gss_ptr->freq[joint]);
       } else {
 	/* not moving this joint */
 	continue;		/* next for (joint) */
@@ -242,7 +250,7 @@ static void stepdir_loop(void * arg)
 
     gss_ptr->heartbeat++;
 
-    rtapi_wait(nsecs_per_task_cycle);
+    rtapi_wait(nsecs_per_period);
   } /* while (1) */
 }
 
@@ -264,13 +272,14 @@ static void stepdir_loop(void * arg)
   implemented here since no real systems using these are known.
 */
 
-static void graycode_loop(void * arg)
+static void graycode_loop(void * args)
 {
+  rtapi_integer type;
+  rtapi_integer periods_per_sec;
   rtapi_integer bits_per_tuple;
   rtapi_integer tuples;		/* how many pairs or quads we support */
   rtapi_integer tuples_per_byte;
-  rtapi_integer nsecs_per_task_cycle;
-  rtapi_integer task_cycles_per_sec;
+  rtapi_integer nsecs_per_period;
   rtapi_integer joint = 0;
   rtapi_integer max_count; /* 'h/f' per description above */
   rtapi_integer count[GO_STEPPER_NUM]; /* this decrements each cycle */
@@ -289,7 +298,10 @@ static void graycode_loop(void * arg)
   char loStr[9], hiStr[9];
 #endif
 
-  if (arg == (void *) 0) {
+  type = ((stepper_loop_args *) args)->type;
+  nsecs_per_period = ((stepper_loop_args *) args)->nsecs_per_period;
+
+  if (GO_STEPPER_GRAYCODE_2BIT == type) {
     /* two-bit Gray code */
     bits_per_tuple = 2;
   } else {
@@ -309,9 +321,8 @@ static void graycode_loop(void * arg)
     index[joint] = 0;
   }
 
-  nsecs_per_task_cycle = rtapi_clock_period;
-  /* task_cycles_per_sec is 'h' per description above */
-  task_cycles_per_sec = 1000000000 / nsecs_per_task_cycle;
+  /* periods_per_sec is 'h' per description above */
+  periods_per_sec = 1000000000 / nsecs_per_period;
   /* gss_ptr->freq[] is 'f' per description above */
 
   while (1) {
@@ -323,10 +334,10 @@ static void graycode_loop(void * arg)
 	/* compute maximum counts for full period, 'h/f' */
 	if (gss_ptr->freq[joint] > 0) {
 	  dir = 1;
-	  max_count = task_cycles_per_sec / (+gss_ptr->freq[joint]);
+	  max_count = periods_per_sec / (+gss_ptr->freq[joint]);
 	} else {
 	  dir = 0;
-	  max_count = task_cycles_per_sec / (-gss_ptr->freq[joint]);
+	  max_count = periods_per_sec / (-gss_ptr->freq[joint]);
 	}
 
 	/* clamp the count to be at or above the minimum */
@@ -388,7 +399,7 @@ static void graycode_loop(void * arg)
 
     gss_ptr->heartbeat++;
 
-    rtapi_wait(nsecs_per_task_cycle);
+    rtapi_wait(nsecs_per_period);
   } /* while (1) */
 }
 
@@ -413,13 +424,14 @@ void rtapi_app_exit(void)
   return;
 }
 
+#define DEFAULT_NSECS_PER_PERIOD 20
+
 int rtapi_app_main(RTAPI_APP_ARGS_DECL)
 {
   void (*stepper_loop)(void * arg);
-  void * stepper_arg;
+  stepper_loop_args stepper_args;
   int stepper_prio;
-  rtapi_integer nsecs_per_period;
-  rtapi_integer nsecs_per_task_cycle;
+  rtapi_integer nsecs_per_period = DEFAULT_NSECS_PER_PERIOD;
 
   if (0 != rtapi_app_init(RTAPI_APP_ARGS)) {
     rtapi_print("gostepper: can't init rtapi\n");
@@ -436,8 +448,7 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   (void) rtapi_arg_get_int(&GO_STEPPER_TYPE, "GO_STEPPER_TYPE");
   if (DEBUG) rtapi_print("gostepper: using GO_STEPPER_TYPE = %d\n", GO_STEPPER_TYPE);
   (void) rtapi_arg_get_int(&nsecs_per_period, "NSECS_PER_PERIOD");
-  if (0 < nsecs_per_period) rtapi_clock_set_period(nsecs_per_period);
-  if (DEBUG) rtapi_print("gostepper: using period = %d\n", rtapi_clock_period);
+  if (DEBUG) rtapi_print("gostepper: using NSECS_PER_PERIOD = %d\n", nsecs_per_period);
 
   /* allocate the shared memory buffer */
   gss_shm = rtapi_rtm_new(GO_STEPPER_SHM_KEY, sizeof(go_stepper_struct));
@@ -452,32 +463,26 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   /* set prio to be highest */
   stepper_prio = rtapi_prio_highest();
 
-  /* set the period to be the global base period, as fast as possible */
-  nsecs_per_task_cycle = rtapi_clock_period;
-
   /* select which stepper type to run */
   switch (GO_STEPPER_TYPE) {
   case GO_STEPPER_DIRSTEP:
     stepper_loop = stepdir_loop;
-    stepper_arg = (void *) 0;
     break;
   case GO_STEPPER_STEPDIR:
     stepper_loop = stepdir_loop;
-    stepper_arg = (void *) 1;
     break;
   case GO_STEPPER_GRAYCODE_2BIT:
     stepper_loop = graycode_loop;
-    stepper_arg = (void *) 0;
     break;
   case GO_STEPPER_GRAYCODE_4BIT:
     stepper_loop = graycode_loop;
-    stepper_arg = (void *) 1;
     break;
   default:
     stepper_loop = stepdir_loop;
-    stepper_arg = (void *) 0;
     break;
   }
+  stepper_args.type = GO_STEPPER_TYPE;
+  stepper_args.nsecs_per_period = nsecs_per_period;
 
   /* launch the stepper task */
   stepper_task = rtapi_task_new();
@@ -487,16 +492,16 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   }
   if (0 != rtapi_task_start(stepper_task,
 			    stepper_loop,
-			    stepper_arg,
+			    &stepper_args,
 			    stepper_prio, 
 			    STEPPER_STACKSIZE,
-			    nsecs_per_task_cycle,
+			    nsecs_per_period,
 			    0)) { /* no floating point */
-    rtapi_print("gostepper: can't start stepper task with period %d\n", nsecs_per_task_cycle);
+    rtapi_print("gostepper: can't start stepper task with period %d\n", nsecs_per_period);
     return -1;
   }
 
-  rtapi_print("gostepper: gostepper started with period %d nsec\n", nsecs_per_task_cycle);
+  rtapi_print("gostepper: gostepper started with period %d nsec\n", nsecs_per_period);
 
   return rtapi_app_wait();
 }

@@ -10,16 +10,17 @@ gomathtest_LDADD = -L../lib -lgo
 gomathtest_DEPENDENCIES = ../lib/libgo.a
 
 gostepper_SOURCES = ../src/gostepper.c ../src/gostepper.h
-gostepper_CFLAGS = -DTARGET_XENOMAI
+gostepper_CFLAGS = -DTARGET_XENOMAI @XENOMAI_CFLAGS@
 gostepper_LDADD = -L../lib -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
 gostepper_DEPENDENCIES = ../lib/libgo.a
 
 gosteppercfg_SOURCES = ../src/gosteppercfg.c 
+gosteppercfg_CFLAGS = -DTARGET_XENOMAI @XENOMAI_CFLAGS@
 gosteppercfg_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
 gosteppercfg_DEPENDENCIES = ../lib/libgo.a
 
 gomain_SOURCES = ../src/extintf.h ../src/pid.c ../src/pid.h ../src/servoloop.c ../src/servointf.h ../src/trajloop.c ../src/trajintf.h ../src/gomain.c ../src/ext_stepper.c
-gomain_CFLAGS = -DTARGET_XENOMAI
+gomain_CFLAGS = -DTARGET_XENOMAI @XENOMAI_CFLAGS@
 gomain_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
 gomain_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
 
