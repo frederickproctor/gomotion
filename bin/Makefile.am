@@ -3,7 +3,7 @@ AM_CPPFLAGS = -I../src -I@ULAPI_DIR@/include
 
 if HAVE_XENOMAI
 
-bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gocfg gosh gokintest
+bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gocfg gosh gokintest goscratchtest
 
 gomathtest_SOURCES = ../src/gomathtest.c 
 gomathtest_LDADD = -L../lib -lgo
@@ -52,6 +52,10 @@ endif
 gokintest_SOURCES = ../src/gokintest.c
 gokintest_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ 
 gokintest_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
+
+goscratchtest_SOURCES = ../src/goscratchtest.c
+goscratchtest_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+goscratchtest_DEPENDENCIES = ../lib/libgo.a
 
 else
 
