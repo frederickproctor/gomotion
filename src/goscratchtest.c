@@ -3,7 +3,7 @@
 #include <math.h>
 #include "go.h"
 
-int main(int argc, char *argv)
+int main(int argc, char *argv[])
 {
   go_mat mat;
   go_rpy rpy;

@@ -55,7 +55,7 @@ extern "C" {
 
   The origin is at point B, giving three parameters necessary to
   characterize the frame given the convenient alignment of the
-  coordinate frame: Cx, Ax and Ay..
+  coordinate frame: Cx, Ax and Ay.
 
   Top view of the horizontal twist bar, looking in the -y direction:
 
