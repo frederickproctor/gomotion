@@ -47,6 +47,8 @@ go_result roboch_kin_init(void * kins)
   roboch->Fx = ROBOCH_FX;
   roboch->LDE = sqrt(go_sq(ROBOCH_DZ) + go_sq(ROBOCH_EX));
 
+  roboch->fflags = (ROBOCH_E_POSITIVE | ROBOCH_P_POSITIVE);
+  
   return GO_RESULT_OK;
 } 
 
