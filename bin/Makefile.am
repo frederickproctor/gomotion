@@ -1,26 +1,14 @@
 AM_CPPFLAGS = -I../src -I@ULAPI_DIR@/include
 
-if HAVE_TCL_INCLUDE
-AM_CPPFLAGS += -I@TCL_INCLUDE_DIR@
-endif
-
-if HAVE_TK_INCLUDE
-AM_CPPFLAGS += -I@TK_INCLUDE_DIR@
-endif
-
-if HAVE_SDL
-AM_CPPFLAGS += @SDL_CFLAGS@
-endif
-
 EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_read modbus_write
 
 bin_PROGRAMS = goscratchtest gomathtest gotrajtest gomotiontest gointerptest gokintest gotestsh gostepper gomain gosteppercfg gocfg gosh gotestmmavg tracker igpsclient igpsserver taskmain tasksvr toolmain variates rs274ngc cartfit rpy2quat quat2rpy
 
 if HAVE_TCL_LIB
 bin_PROGRAMS += gotcl
-endif
 if HAVE_TK_LIB
 bin_PROGRAMS += gotk
+endif
 endif
 
 bin_PROGRAMS += gorun
@@ -146,33 +134,31 @@ variates_CFLAGS = -DMAIN
 rs274ngc_SOURCES = ../src/rs274ngc_pre.cc ../src/rs274ngc.h ../src/rs274ngc_return.h ../src/canon_pre.cc ../src/canon.h ../src/rs274ngc_driver.cc
 rs274ngc_CFLAGS = -DAA -DBB -DCC
 
-if HAVE_TCL_INCLUDE
 if HAVE_TCL_LIB
 
 # gotcl is the Tcl-enabled script interface that doesn't require X Windows
 # or a DISPLAY environment variable
 gotcl_SOURCES = ../src/gotcl.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotcl_CFLAGS = -I@TCL_INCLUDE_DIR@
 gotcl_LDADD = ../lib/libgo.a @TCL_LINK@ @ULAPI_LIBS@ 
 if HAVE_SDL
+gotcl_CFLAGS += @SDL_CFLAGS@
 gotcl_LDADD += @SDL_LIBS@
 endif
 gotcl_DEPENDENCIES = ../lib/libgo.a
 
-if HAVE_TK_INCLUDE
 if HAVE_TK_LIB
 
 # gotk is the Tk-enabled script interface that requires X Windows
 # and a DISPLAY environment variable
 gotk_SOURCES = ../src/gotk.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
-gotk_CFLAGS = @X_CFLAGS@
-gotk_LDADD = ../lib/libgo.a @TCL_LINK@ @TK_LINK@ @X_PRE_LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @ULAPI_LIBS@ 
+gotk_CFLAGS =  -I@TCL_INCLUDE_DIR@ @X_CFLAGS@ -I@TK_INCLUDE_DIR@
+gotk_LDADD = ../lib/libgo.a @TK_LINK@ @X_PRE_LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @TCL_LINK@  @ULAPI_LIBS@ 
 if HAVE_SDL
+gotk_CFLAGS += @SDL_CFLAGS@
 gotk_LDADD += @SDL_LIBS@
 endif
 gotk_DEPENDENCIES = ../lib/libgo.a
-
-endif
-endif
 
 endif
 endif
