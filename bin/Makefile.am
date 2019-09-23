@@ -1,4 +1,50 @@
+
 AM_CPPFLAGS = -I../src -I@ULAPI_DIR@/include
+
+if HAVE_XENOMAI
+
+bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gocfg gosh gokintest goscratchtest
+
+gomathtest_SOURCES = ../src/gomathtest.c 
+gomathtest_LDADD = -L../lib -lgo
+gomathtest_DEPENDENCIES = ../lib/libgo.a
+
+gostepper_SOURCES = ../src/gostepper.c ../src/gostepper.h
+gostepper_CFLAGS = -DTARGET_XENOMAI @XENOMAI_CFLAGS@
+gostepper_LDADD = -L../lib -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
+gostepper_DEPENDENCIES = ../lib/libgo.a
+
+gosteppercfg_SOURCES = ../src/gosteppercfg.c 
+gosteppercfg_CFLAGS = -DTARGET_XENOMAI @XENOMAI_CFLAGS@
+gosteppercfg_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+gosteppercfg_DEPENDENCIES = ../lib/libgo.a
+
+gomain_SOURCES = ../src/extintf.h ../src/pid.c ../src/pid.h ../src/servoloop.c ../src/servointf.h ../src/trajloop.c ../src/trajintf.h ../src/gomain.c ../src/ext_stepper.c
+gomain_CFLAGS = -DTARGET_XENOMAI @XENOMAI_CFLAGS@
+gomain_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ @XENOMAI_LDFLAGS@ -lm
+gomain_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
+
+gocfg_SOURCES = ../src/gocfg.c ../src/pid.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gocfg_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+gocfg_DEPENDENCIES = ../lib/libgo.a
+
+gosh_SOURCES = ../src/gosh.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gosh_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+gosh_DEPENDENCIES = ../lib/libgo.a
+
+gokintest_SOURCES = ../src/gokintest.c
+gokintest_LDADD = -L../lib -lgokin -lgo @ULAPI_LIBS@ 
+gokintest_DEPENDENCIES = ../lib/libgokin.a ../lib/libgo.a
+
+goscratchtest_SOURCES = ../src/goscratchtest.c
+goscratchtest_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
+goscratchtest_DEPENDENCIES = ../lib/libgo.a
+
+else
+
+### normal Unix
+
+AM_CPPFLAGS += -DTARGET_UNIX
 
 EXTRA_DIST = gorun.sh checkgo killgo pendant.tcl gogui.tcl move.tcl insrtl rmrtl ipc-clear updown mtconnect_client spinup modbus_read modbus_write
 
@@ -272,3 +318,7 @@ bin_PROGRAMS += smartmotor_md
 smartmotor_md_SOURCES = \
 ../src/smartmotor_md.c
 smartmotor_md_LDADD = @ULAPI_LIBS@ 
+
+### normal Unix
+
+endif

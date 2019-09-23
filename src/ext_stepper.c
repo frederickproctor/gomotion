@@ -74,7 +74,7 @@ go_result ext_init(char * init_string)
     rtapi_print("can't get stepper shm\n");
     return GO_RESULT_ERROR;
   }
-  gss_ptr = rtapi_rtm_addrr(gss_shm);
+  gss_ptr = rtapi_rtm_addr(gss_shm);
 
   for (joint = 0; joint < GO_STEPPER_NUM; joint++) {
     /* clear the frequency but leave gss_ptr->count[] alone, since

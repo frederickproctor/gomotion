@@ -13,7 +13,7 @@
 #include <math.h>		/* sqrt */
 #include "gotypes.h"		/* go_result, go_integer */
 #include "gomath.h"		/* go_pose */
-#include "roboch.h"		/* these decls */
+#include "robochkins.h"		/* these decls */
 
 /* despite these defs, the values are assumed to be 7 and 6 and can't
    simply be changed here */
@@ -47,6 +47,8 @@ go_result roboch_kin_init(void * kins)
   roboch->Fx = ROBOCH_FX;
   roboch->LDE = sqrt(go_sq(ROBOCH_DZ) + go_sq(ROBOCH_EX));
 
+  roboch->fflags = (ROBOCH_E_POSITIVE | ROBOCH_P_POSITIVE);
+  
   return GO_RESULT_OK;
 } 
 

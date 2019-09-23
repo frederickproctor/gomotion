@@ -69,3 +69,4 @@ src/Makefile
 src/Makefile.in
 src/*.o
 ulapi_dir
+xenomaidir

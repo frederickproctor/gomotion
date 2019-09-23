@@ -9,8 +9,8 @@
   See NIST Administration Manual 4.09.07 b and Appendix I. 
 */
 
-#ifndef ROBOCH_H
-#define ROBOCH_H
+#ifndef ROBOCHKINS_H
+#define ROBOCHKINS_H
 
 #include "gotypes.h"		/* go_result, go_integer */
 #include "gomath.h"		/* go_pose */
@@ -55,7 +55,7 @@ extern "C" {
 
   The origin is at point B, giving three parameters necessary to
   characterize the frame given the convenient alignment of the
-  coordinate frame: Cx, Ax and Ay..
+  coordinate frame: Cx, Ax and Ay.
 
   Top view of the horizontal twist bar, looking in the -y direction:
 
@@ -156,4 +156,4 @@ extern go_result roboch_kin_jac_fwd(void * kins,
 }
 #endif
 
-#endif /* ROBOCH_H */
+#endif /* ROBOCHKINS_H */

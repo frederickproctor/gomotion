@@ -24,7 +24,7 @@ goutil.h \
 interplist.h \
 pid.h \
 pumakins.h \
-roboch.h \
+robochkins.h \
 rs274ngc.h \
 rs274ngc_return.h \
 scarakins.h \

@@ -21,6 +21,7 @@
 #include "trivkins.h"
 #include "tripointkins.h"
 #include "spheristkins.h"
+#include "roboch.h"
 
 static enum {
   USE_TRIVKINS = 1,
@@ -32,7 +33,8 @@ static enum {
   USE_SCARAKINS,
   USE_TRIPOINTKINS,
   USE_SPHERISTKINS,
-  USE_THREE21KINS
+  USE_THREE21KINS,
+  USE_ROBOCHKINS
 } go_kin_which = USE_TRIVKINS;
 
 static go_integer strmatch(const char * a, const char * b)
@@ -85,6 +87,10 @@ go_result go_kin_select(const char * name)
     go_kin_which = USE_THREE21KINS;
     return GO_RESULT_OK;
   }
+  if (strmatch(name, roboch_kin_get_name())) {
+    go_kin_which = USE_ROBOCHKINS;
+    return GO_RESULT_OK;
+  }
 
   go_kin_which = USE_TRIVKINS;
   return GO_RESULT_ERROR;
@@ -110,6 +116,8 @@ go_integer go_kin_size(void)
     return spherist_kin_size();
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_size();
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_size();
 
   return triv_kin_size();
 }
@@ -134,6 +142,8 @@ go_result go_kin_init(void * kins)
     return spherist_kin_init(kins);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_init(kins);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_init(kins);
 
   return triv_kin_init(kins);
 }
@@ -158,6 +168,8 @@ const char * go_kin_get_name(void)
     return spherist_kin_get_name();
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_get_name();
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_get_name();
 
   return triv_kin_get_name();
 }
@@ -182,6 +194,8 @@ go_integer go_kin_num_joints(void * kins)
     return spherist_kin_num_joints(kins);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_num_joints(kins);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_num_joints(kins);
 
   return triv_kin_num_joints(kins);
 }
@@ -208,6 +222,8 @@ go_result go_kin_fwd(void * kins,
     return spherist_kin_fwd(kins, joint, world);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_fwd(kins, joint, world);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_fwd(kins, joint, world);
 
   return triv_kin_fwd(kins, joint, world);
 }
@@ -234,6 +250,8 @@ go_result go_kin_inv(void * kins,
     return spherist_kin_inv(kins, world, joint);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_inv(kins, world, joint);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_inv(kins, world, joint);
 
   return triv_kin_inv(kins, world, joint);
 }
@@ -258,6 +276,8 @@ go_kin_type go_kin_get_type(void * kins)
     return spherist_kin_get_type(kins);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_get_type(kins);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_get_type(kins);
 
   return triv_kin_get_type(kins);
 }
@@ -282,6 +302,8 @@ go_result go_kin_set_parameters(void * kins, go_link * params, go_integer num)
     return spherist_kin_set_parameters(kins, params, num);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_set_parameters(kins, params, num);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_set_parameters(kins, params, num);
 
   return triv_kin_set_parameters(kins, params, num);
 }
@@ -306,6 +328,8 @@ go_result go_kin_get_parameters(void * kins, go_link * params, go_integer num)
     return spherist_kin_get_parameters(kins, params, num);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_get_parameters(kins, params, num);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_get_parameters(kins, params, num);
 
   return triv_kin_get_parameters(kins, params, num);
 }
@@ -333,6 +357,8 @@ go_result go_kin_jac_inv(void * kins,
     return spherist_kin_jac_inv(kins, pos, vel, joints, jointvels);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_jac_inv(kins, pos, vel, joints, jointvels);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_jac_inv(kins, pos, vel, joints, jointvels);
 
   return triv_kin_jac_inv(kins, pos, vel, joints, jointvels);
 }
@@ -362,6 +388,8 @@ go_result go_kin_jac_fwd(void * kins,
     return spherist_kin_jac_fwd(kins, joints, jointvels, pos, vel);
   if (go_kin_which == USE_THREE21KINS)
     return three21_kin_jac_fwd(kins, joints, jointvels, pos, vel);
+  if (go_kin_which == USE_ROBOCHKINS)
+    return roboch_kin_jac_fwd(kins, joints, jointvels, pos, vel);
 
   return triv_kin_jac_fwd(kins, joints, jointvels, pos, vel);
 }

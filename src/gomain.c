@@ -178,7 +178,7 @@ int rtapi_app_main(RTAPI_APP_ARGS_DECL)
   /* we'll rely on the HAL to set the base timer period. */
 
   /* set prios as servo, then traj */
-  servo_prio = rtapi_prio_highest();
+  servo_prio = rtapi_prio_next_lower(rtapi_prio_highest());
   traj_prio = rtapi_prio_next_lower(servo_prio);
 
   /* initialize the external interface */
