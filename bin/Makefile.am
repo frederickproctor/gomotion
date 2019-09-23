@@ -40,6 +40,42 @@ goscratchtest_SOURCES = ../src/goscratchtest.c
 goscratchtest_LDADD = -L../lib -lgo @ULAPI_LIBS@ 
 goscratchtest_DEPENDENCIES = ../lib/libgo.a
 
+if HAVE_TCL_LIB
+bin_PROGRAMS += gotcl
+if HAVE_TK_LIB
+bin_PROGRAMS += gotk
+endif
+endif
+
+if HAVE_TCL_LIB
+
+# gotcl is the Tcl-enabled script interface that doesn't require X Windows
+# or a DISPLAY environment variable
+gotcl_SOURCES = ../src/gotcl.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotcl_CFLAGS = -I@TCL_INCLUDE_DIR@
+gotcl_LDADD = ../lib/libgo.a @TCL_LINK@ @ULAPI_LIBS@ 
+if HAVE_SDL
+gotcl_CFLAGS += @SDL_CFLAGS@
+gotcl_LDADD += @SDL_LIBS@
+endif
+gotcl_DEPENDENCIES = ../lib/libgo.a
+
+if HAVE_TK_LIB
+
+# Gotk is the Tk-enabled script interface that requires X Windows
+# and a DISPLAY environment variable
+gotk_SOURCES = ../src/gotk.c ../src/gotcltk.c ../src/gorcsutil.c ../src/gorcsutil.h ../src/servointf.h ../src/trajintf.h ../src/toolintf.h ../src/taskintf.c ../src/taskintf.h
+gotk_CFLAGS =  -I@TCL_INCLUDE_DIR@ @X_CFLAGS@ -I@TK_INCLUDE_DIR@
+gotk_LDADD = ../lib/libgo.a @TK_LINK@ @X_PRE_LIBS@ @X_LIBS@ @X_EXTRA_LIBS@ @TCL_LINK@  @ULAPI_LIBS@ 
+if HAVE_SDL
+gotk_CFLAGS += @SDL_CFLAGS@
+gotk_LDADD += @SDL_LIBS@
+endif
+gotk_DEPENDENCIES = ../lib/libgo.a
+
+endif
+endif
+
 else
 
 ### normal Unix
