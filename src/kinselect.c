@@ -21,7 +21,7 @@
 #include "trivkins.h"
 #include "tripointkins.h"
 #include "spheristkins.h"
-#include "roboch.h"
+#include "robochkins.h"
 
 static enum {
   USE_TRIVKINS = 1,
