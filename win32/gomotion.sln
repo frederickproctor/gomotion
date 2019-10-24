@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual C++ Express 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gocfg", "gocfg\gocfg.vcxproj", "{53CE3F9C-915A-4F32-B5C7-9282FB5B2F91}"
 	ProjectSection(ProjectDependencies) = postProject
 		{D285D41B-3138-4AB5-9C9F-C88DDD506553} = {D285D41B-3138-4AB5-9C9F-C88DDD506553}
@@ -68,6 +70,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gomain_smartmotor", "gomain
 		{D285D41B-3138-4AB5-9C9F-C88DDD506553} = {D285D41B-3138-4AB5-9C9F-C88DDD506553}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gokintest", "gokintest\gokintest.vcxproj", "{FC97C295-D11B-4FC2-B3CD-77DE0A2F66D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -130,6 +134,10 @@ Global
 		{839EA402-3C97-4E5B-8342-397C6204708F}.Debug|Win32.Build.0 = Debug|Win32
 		{839EA402-3C97-4E5B-8342-397C6204708F}.Release|Win32.ActiveCfg = Release|Win32
 		{839EA402-3C97-4E5B-8342-397C6204708F}.Release|Win32.Build.0 = Release|Win32
+		{FC97C295-D11B-4FC2-B3CD-77DE0A2F66D6}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FC97C295-D11B-4FC2-B3CD-77DE0A2F66D6}.Debug|Win32.Build.0 = Debug|Win32
+		{FC97C295-D11B-4FC2-B3CD-77DE0A2F66D6}.Release|Win32.ActiveCfg = Release|Win32
+		{FC97C295-D11B-4FC2-B3CD-77DE0A2F66D6}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
