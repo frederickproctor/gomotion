@@ -92,6 +92,7 @@
     <ClCompile Include="..\..\src\kinselect.c" />
     <ClCompile Include="..\..\src\pid.c" />
     <ClCompile Include="..\..\src\pumakins.c" />
+    <ClCompile Include="..\..\src\robochkins.c" />
     <ClCompile Include="..\..\src\scarakins.c" />
     <ClCompile Include="..\..\src\spheristkins.c" />
     <ClCompile Include="..\..\src\taskintf.c" />
