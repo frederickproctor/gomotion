@@ -56,9 +56,10 @@ config/install-sh
 config/missing
 config/stamp-h1
 configure
+doxygen-doc
 etc/Makefile
 etc/Makefile.in
-lib/.deps/
+lib/.deps
 lib/Makefile
 lib/Makefile.in
 lib/*.a
