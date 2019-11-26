@@ -138,7 +138,7 @@ extern go_result roboch_kin_get_parameters(void * kins, go_link * params, go_int
 
 extern go_result roboch_kin_jac_inv(void * kins,
 				    const go_pose * pos,
-				    const go_pose * vel,
+				    const go_vel * vel,
 				    const go_real * joints, 
 				    go_real * jointvels); 
 
@@ -147,7 +147,7 @@ extern go_result roboch_kin_jac_fwd(void * kins,
 				    const go_real * joints,
 				    const go_real * jointvels,
 				    const go_pose * pos,
-				    go_pose * vel);
+				    go_vel * vel);
 
 #if 0
 {

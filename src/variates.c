@@ -225,6 +225,44 @@ double uniform_random_real(uniform_random_struct *r)
 }
 
 /*
+  The triangular random variate uses a single unit random variate
+*/
+void triangular_random_init(triangular_random_struct *r, double min, double max, double mode)
+{
+  unit_random_init(&r->u);
+  triangular_random_set(r, min, max, mode);
+}
+
+void triangular_random_set(triangular_random_struct *r, double min, double max, double mode)
+{
+  if (min >= max) return;
+  if (mode < min) return;
+  if (mode > max) return;
+
+  r->min = min;
+  r->max = max;
+  r->mode = mode;
+  r->F = (mode - min) / (max - min);
+  r->d1 = sqrt((max - min)*(mode - min));
+  r->d2= sqrt((max - min)*(max - mode));
+}
+
+void triangular_random_seed(triangular_random_struct *r, long int s)
+{
+  unit_random_seed(&r->u, s);
+}
+
+double triangular_random_real(triangular_random_struct *r)
+{
+  double u;
+  
+  u = unit_random_real(&r->u);
+
+  if (u < r->F) return r->min + sqrt(u)*r->d1;
+  else return r->max - sqrt(1 - u)*r->d2;
+}
+
+/*
   The normal, exponential, and weibull random number generators are
   those described in _Simulation Modeling and Analysis_, Averill
   M. Law and W. David Kelton, Second Edition, pp. 486, 490.
@@ -518,16 +556,23 @@ static int bins(int argc, char *argv[])
   gamma, or pearson_v.
 */
 
+/*
+  Plot output data as histograms using 'gnuplot' like this: 
+
+  echo "binwidth=0.1; bin(x,width)=width*floor(x/width);plot 'out.dat' using (bin(\$1,binwidth)):(1.0) smooth freq with boxes" | gnuplot - -persist
+*/
+
 int main(int argc, char *argv[])
 {
   unit_random_struct u;
   uniform_random_struct f;
+  triangular_random_struct tr;
   normal_random_struct n;
   exponential_random_struct e;
   weibull_random_struct w;
   gamma_random_struct g;
   pearson_v_random_struct pv;
-  double a, b;
+  double a, b, c;
   int num;
   int t;
 
@@ -558,6 +603,18 @@ int main(int argc, char *argv[])
     uniform_random_init(&f, a, b);
     for (t = 0; t < num; t++) {
       printf("%f\n", uniform_random_real(&f));
+    }
+  } else if (! strcmp(argv[1], "triangular")) {
+    if (argc != 6 ||
+	1 != sscanf(argv[3], "%lf", &a) ||
+	1 != sscanf(argv[4], "%lf", &b) ||
+	1 != sscanf(argv[5], "%lf", &c)) {
+      fprintf(stderr, "usage: triangular <number to generate> <min> <max> <mode>\n");
+      return 1;
+    }
+    triangular_random_init(&tr, a, b, c);
+    for (t = 0; t < num; t++) {
+      printf("%f\n", triangular_random_real(&tr));
     }
   } else if (! strcmp(argv[1], "normal")) {
     if (argc != 5 ||
@@ -614,7 +671,7 @@ int main(int argc, char *argv[])
       printf("%f\n", pearson_v_random_real(&pv));
     }
   } else {
-    fprintf(stderr, "usage: need one of\n unit\n uniform\n normal\n exponential\n weibull\n 'gamma\n pearson_v\n");
+    fprintf(stderr, "usage: need one of\n unit\n uniform\n triangular\n normal\n exponential\n weibull\n gamma\n pearson_v\n");
     return 1;
   }
 

@@ -59,6 +59,21 @@ extern void uniform_random_seed(uniform_random_struct *r, long int s);
 extern double uniform_random_real(uniform_random_struct *r);
 
 typedef struct {
+  unit_random_struct u;
+  double min;
+  double max;
+  double mode;
+  double F;			/* (mode-min)/(max-min) */
+  double d1;			/* sqrt((max-min)(mode-min)) */
+  double d2;			/* sqrt((max-min)(max-mode)) */
+} triangular_random_struct;
+
+extern void triangular_random_init(triangular_random_struct *r, double min, double max, double mode);
+extern void triangular_random_set(triangular_random_struct *r, double min, double max, double mode);
+extern void triangular_random_seed(triangular_random_struct *r, long int s);
+extern double triangular_random_real(triangular_random_struct *r);
+
+typedef struct {
   unit_random_struct u1, u2;
   double x1, x2;
   double mean;

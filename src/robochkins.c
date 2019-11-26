@@ -358,25 +358,23 @@ static go_result jac_inv_mat(roboch_kin_struct * roboch,
 
 go_result roboch_kin_jac_inv(void * kins,
 			     const go_pose * pos,
-			     const go_pose * vel,
+			     const go_vel * vel,
 			     const go_real * joints, 
 			     go_real * jointvels)
 {
   go_real jac_inv[6][6];
   go_real vel_vec[6];		/* vx vx vz vr vp vw */
-  go_rpy rpy;
   go_result retval;
 
   retval = jac_inv_mat(kins, pos, jac_inv);
   if (GO_RESULT_OK != retval) return retval;
 
-  go_quat_rpy_convert(&vel->rot, &rpy);
-  vel_vec[0] = vel->tran.x;
-  vel_vec[1] = vel->tran.y;
-  vel_vec[2] = vel->tran.z;
-  vel_vec[3] = rpy.r;
-  vel_vec[4] = rpy.p;
-  vel_vec[5] = rpy.y;
+  vel_vec[0] = vel->v.x;
+  vel_vec[1] = vel->v.y;
+  vel_vec[2] = vel->v.z;
+  vel_vec[3] = vel->w.x;
+  vel_vec[4] = vel->w.y;
+  vel_vec[5] = vel->w.z;
 
   (void) go_mat6_vec6_mult(jac_inv, vel_vec, jointvels);
 
@@ -387,12 +385,11 @@ go_result roboch_kin_jac_fwd(void * kins,
 			     const go_real * joints,
 			     const go_real * jointvels,
 			     const go_pose * pos,
-			     go_pose * vel)
+			     go_vel * vel)
 {
   go_real jac[6][6];
   go_real jac_inv[6][6];
   go_real vel_vec[6];
-  go_rpy rpy;
   go_result retval;
 
   retval = jac_inv_mat(kins, pos, jac_inv);
@@ -403,13 +400,12 @@ go_result roboch_kin_jac_fwd(void * kins,
 
   (void) go_mat6_vec6_mult(jac, jointvels, vel_vec);
 
-  vel->tran.x = vel_vec[0];
-  vel->tran.y = vel_vec[1];
-  vel->tran.z = vel_vec[2];
-  rpy.r = vel_vec[3];
-  rpy.p = vel_vec[4];
-  rpy.y = vel_vec[5];
-  go_rpy_quat_convert(&rpy, &vel->rot);
+  vel->v.x = vel_vec[0];
+  vel->v.y = vel_vec[1];
+  vel->v.z = vel_vec[2];
+  vel->v.x = vel_vec[3];
+  vel->v.y = vel_vec[4];
+  vel->v.z = vel_vec[5];
 
   return GO_RESULT_OK;
 }
