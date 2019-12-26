@@ -230,6 +230,11 @@ dnl exploit variable generated inside configure script
  	[AM_CONDITIONAL(HAVE_LIBGSL, test x$ac_cv_lib_gsl_gsl_blas_dgemm = xyes)]
 )
 
+AC_DEFUN([ACX_PIC],
+	PIC_CFLAGS="-fPIC"
+	[AC_SUBST(PIC_CFLAGS)]
+)	
+
 AC_DEFUN([ACX_PRE_GOMOTION],
 	[ACX_ULAPI]
 	[ACX_SYSTEM_TYPE]
@@ -244,6 +249,7 @@ AC_DEFUN([ACX_PRE_GOMOTION],
 	[ACX_HAVE_EXTINTF]
 	[ACX_HAVE_SDL]
 	[ACX_HAVE_LIBGSL]
+	[ACX_PIC]
 )
 
 AC_DEFUN([ACX_GOMOTION],

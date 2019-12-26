@@ -5,7 +5,8 @@ if HAVE_XENOMAI
 
 bin_PROGRAMS = gomathtest gostepper gosteppercfg gomain gocfg gosh gokintest goscratchtest
 
-gomathtest_SOURCES = ../src/gomathtest.c 
+gomathtest_SOURCES = ../src/gomathtest.c
+gomathtest_CFLAGS = @PIC_CFLAGS@
 gomathtest_LDADD = -L../lib -lgo
 gomathtest_DEPENDENCIES = ../lib/libgo.a
 
